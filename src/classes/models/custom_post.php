@@ -158,14 +158,14 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 	}
 
 	/**
-	 * @param array $counts
+	 * @param object $counts
 	 * @param string $type
 	 * @param string $perm
 	 *
 	 * @return array|bool|mixed|object|\stdClass
 	 */
 	/** @noinspection PhpUnusedPrivateMethodInspection */
-	private function wp_count_posts( array $counts, $type = 'post', $perm = '' ) {
+	private function wp_count_posts( $counts, $type = 'post', $perm = '' ) {
 		if ( ! is_admin() || ! $this->is_valid_custom_post_type( $type ) ) {
 			return $counts;
 		}
