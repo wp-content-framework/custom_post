@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Framework_Custom_Post Traits Helper Custom Post
+ * WP_Framework_Custom_Post Traits Custom Post
  *
  * @version 0.0.1
  * @author technote-space
@@ -9,7 +9,7 @@
  * @link https://technote.space
  */
 
-namespace WP_Framework_Custom_Post\Traits\Helper;
+namespace WP_Framework_Custom_Post\Traits;
 
 if ( ! defined( 'WP_CONTENT_FRAMEWORK' ) ) {
 	exit;
@@ -17,7 +17,7 @@ if ( ! defined( 'WP_CONTENT_FRAMEWORK' ) ) {
 
 /**
  * Trait Custom_Post
- * @package WP_Framework_Custom_Post\Traits\Helper
+ * @package WP_Framework_Custom_Post\Traits
  * @property \WP_Framework $app
  * @mixin \WP_Framework_Core\Traits\Helper\Data_Helper
  */
