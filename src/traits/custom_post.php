@@ -372,13 +372,13 @@ trait Custom_Post {
 
 	/**
 	 * @param string $join
-	 * @param \WP_Query $wp_query
+	 * @param \WP_Query|string $wp_query
 	 *
 	 * @return string
 	 */
 	public function posts_join(
 		/** @noinspection PhpUnusedParameterInspection */
-		$join, \WP_Query $wp_query
+		$join, $wp_query
 	) {
 		/** @var \wpdb $wpdb */
 		global $wpdb;

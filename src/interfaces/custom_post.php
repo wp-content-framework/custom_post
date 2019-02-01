@@ -117,11 +117,11 @@ interface Custom_Post extends \WP_Framework_Core\Interfaces\Singleton, \WP_Frame
 
 	/**
 	 * @param string $join
-	 * @param \WP_Query $wp_query
+	 * @param \WP_Query|string $wp_query
 	 *
 	 * @return string
 	 */
-	public function posts_join( $join, \WP_Query $wp_query );
+	public function posts_join( $join, $wp_query );
 
 	/**
 	 * @param array $columns
