@@ -421,7 +421,9 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 		if ( $this->is_valid_custom_post_type( $post->post_type ) ) {
 			$custom_post = $this->get_custom_post_type( $post->post_type );
 			if ( ! empty( $custom_post ) ) {
-				$this->app->api->set_use_all_api_flag( true );
+				if ( $this->app->is_valid_package( 'api' ) ) {
+					$this->app->api->set_use_all_api_flag( true );
+				}
 				$this->app->session->delete( 'validation_errors' );
 				$this->app->session->delete( 'updated_message' );
 				$custom_post->output_edit_form( $post );
