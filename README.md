@@ -17,6 +17,7 @@
 ## 依存モジュール
 * [presenter](https://github.com/wp-content-framework/presenter)  
 * [db](https://github.com/wp-content-framework/db) 
+* [session](https://github.com/wp-content-framework/session) 
 
 ## 基本設定
 - configs/config.php  
