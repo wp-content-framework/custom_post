@@ -23,7 +23,7 @@ if ( ! defined( 'WP_CONTENT_FRAMEWORK' ) ) {
  */
 trait Custom_Post {
 
-	use \WP_Framework_Core\Traits\Singleton, \WP_Framework_Core\Traits\Hook, \WP_Framework_Presenter\Traits\Presenter;
+	use \WP_Framework_Core\Traits\Singleton, \WP_Framework_Core\Traits\Hook, \WP_Framework_Presenter\Traits\Presenter, Package;
 
 	/**
 	 * @var string $_slug
