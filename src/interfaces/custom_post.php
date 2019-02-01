@@ -135,7 +135,7 @@ interface Custom_Post extends \WP_Framework_Core\Interfaces\Singleton, \WP_Frame
 	 * @param string $column_name
 	 * @param \WP_Post $post
 	 */
-	public function manage_posts_custom_column( $column_name, $post );
+	public function manage_posts_custom_column( $column_name, \WP_Post $post );
 
 	/**
 	 * @param int $post_id
