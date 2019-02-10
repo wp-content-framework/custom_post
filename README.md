@@ -15,7 +15,6 @@
 ``` composer require wp-content-framework/custom_post ```  
 
 ## 依存モジュール
-* [presenter](https://github.com/wp-content-framework/presenter)  
 * [db](https://github.com/wp-content-framework/db) 
 * [session](https://github.com/wp-content-framework/session) 
 * [admin](https://github.com/wp-content-framework/admin)  
