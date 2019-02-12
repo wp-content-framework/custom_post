@@ -157,6 +157,28 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 	}
 
 	/**
+	 * @param \WP_Query $wp_query
+	 */
+	/** @noinspection PhpUnusedPrivateMethodInspection */
+	private function pre_get_posts( $wp_query ) {
+		if ( ! $wp_query->is_admin ) {
+			return;
+		}
+
+		$post_type = $wp_query->get( 'post_type' );
+		if ( empty( $post_type ) ) {
+			return;
+		}
+
+		$custom_post = $this->get_custom_post_type( $post_type );
+		if ( empty( $custom_post ) ) {
+			return;
+		}
+
+		$custom_post->pre_get_posts( $wp_query );
+	}
+
+	/**
 	 * @since 0.0.4 #1
 	 *
 	 * @param object $counts
