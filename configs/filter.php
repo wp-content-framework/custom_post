@@ -37,6 +37,9 @@ return [
 		'posts_search'                 => [
 			'posts_search' => [],
 		],
+		'pre_get_posts'                => [
+			'pre_get_posts',
+		],
 		'save_post'                    => [
 			'save_post' => [],
 		],

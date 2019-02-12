@@ -124,6 +124,11 @@ interface Custom_Post extends \WP_Framework_Core\Interfaces\Singleton, \WP_Frame
 	public function posts_join( $join, $wp_query );
 
 	/**
+	 * @param \WP_Query $wp_query
+	 */
+	public function pre_get_posts( $wp_query );
+
+	/**
 	 * @param array $columns
 	 * @param bool $sortable
 	 *
