@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Framework_Core Views Admin Include Custom Post Number
+ * WP_Framework_Core Views Admin Include Custom Post Input Number
  *
  * @version 0.0.1
  * @author technote-space
