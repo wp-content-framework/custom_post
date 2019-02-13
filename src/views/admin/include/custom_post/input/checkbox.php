@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Framework_Core Views Admin Include Custom Post Checkbox
+ * WP_Framework_Core Views Admin Include Custom Post Input Checkbox
  *
  * @version 0.0.1
  * @author technote-space
