@@ -2,7 +2,7 @@
 /**
  * WP_Framework_Custom_Post Traits Custom Post
  *
- * @version 0.0.15
+ * @version 0.0.16
  * @author technote-space
  * @copyright technote-space All Rights Reserved
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU General Public License, version 2
@@ -724,7 +724,7 @@ trait Custom_Post {
 	 *
 	 * @return array
 	 */
-	protected function filter_item( $d ) {
+	protected function filter_item( array $d ) {
 		return $d;
 	}
 
@@ -1084,6 +1084,13 @@ trait Custom_Post {
 		array $data, array $post_array
 	) {
 		return $data;
+	}
+
+	/**
+	 * setup page
+	 */
+	public function setup_page() {
+
 	}
 
 	/**
