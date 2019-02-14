@@ -724,7 +724,7 @@ trait Custom_Post {
 	 *
 	 * @return array
 	 */
-	protected function filter_item( $d ) {
+	protected function filter_item( array $d ) {
 		return $d;
 	}
 
