@@ -18,7 +18,7 @@ if ( ! defined( 'WP_CONTENT_FRAMEWORK' ) ) {
 /** @var array $columns */
 /** @var string $prefix */
 ?>
-<div class="block form">
+<div class="block form custom-post">
     <dl>
 		<?php foreach ( $columns as $name => $column ): ?>
 			<?php if ( empty( $column['is_user_defined'] ) || 'post_id' === $column['name'] ): continue; endif; ?>
