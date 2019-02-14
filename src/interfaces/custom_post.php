@@ -256,6 +256,11 @@ interface Custom_Post extends \WP_Framework_Core\Interfaces\Singleton, \WP_Frame
 	public function filter_post_data( array $data, array $post_array );
 
 	/**
+	 * setup page
+	 */
+	public function setup_page();
+
+	/**
 	 * @param string $key
 	 * @param array $errors
 	 *

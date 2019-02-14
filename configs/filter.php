@@ -65,7 +65,11 @@ return [
 			'redirect_post_location',
 		],
 		'load-post.php'                => [
+			'setup_page',
 			'set_admin_notices',
+		],
+		'load-post-new.php'            => [
+			'setup_page',
 		],
 		'edit_form_after_title'        => [
 			'edit_form_after_title',

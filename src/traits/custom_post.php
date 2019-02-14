@@ -1087,6 +1087,13 @@ trait Custom_Post {
 	}
 
 	/**
+	 * setup page
+	 */
+	public function setup_page() {
+
+	}
+
+	/**
 	 * @param string $key
 	 * @param array $errors
 	 *

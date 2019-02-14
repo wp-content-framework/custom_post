@@ -407,6 +407,20 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 	}
 
 	/**
+	 * setup page
+	 */
+	/** @noinspection PhpUnusedPrivateMethodInspection */
+	private function setup_page() {
+		global $typenow;
+		if ( ! empty( $typenow ) && $this->is_valid_custom_post_type( $typenow ) ) {
+			$custom_post = $this->get_custom_post_type( $typenow );
+			if ( ! empty( $custom_post ) ) {
+				$custom_post->setup_page();
+			}
+		}
+	}
+
+	/**
 	 * admin notices
 	 */
 	/** @noinspection PhpUnusedPrivateMethodInspection */
