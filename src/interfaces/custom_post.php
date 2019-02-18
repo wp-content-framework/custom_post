@@ -203,6 +203,12 @@ interface Custom_Post extends \WP_Framework_Core\Interfaces\Singleton, \WP_Frame
 
 	/**
 	 * @param int $post_id
+	 * @param \WP_Post $post
+	 */
+	public function untrash_post( $post_id, \WP_Post $post );
+
+	/**
+	 * @param int $post_id
 	 */
 	public function trash_post( $post_id );
 

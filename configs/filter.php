@@ -42,6 +42,7 @@ return [
 		],
 		'save_post'                    => [
 			'save_post',
+			'untrash_post',
 		],
 		'wp_trash_post'                => [
 			'wp_trash_post',
