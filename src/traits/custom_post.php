@@ -394,43 +394,59 @@ trait Custom_Post {
 	public function pre_get_posts( $wp_query ) {
 		$orderby = $wp_query->get( 'orderby' );
 		$table   = $this->app->db->get_table( $this->get_related_table_name() );
-		foreach ( $this->get_manage_posts_columns() as $k => $v ) {
-			if ( ! is_array( $v ) || empty( $v['sortable'] ) ) {
-				continue;
-			}
-			$key = $this->get_post_type() . '-' . $k;
-			if ( empty( $orderby ) ) {
+
+		if ( empty( $orderby ) ) {
+			$_orderby_list = [];
+			foreach ( $this->get_manage_posts_columns() as $k => $v ) {
+				if ( ! is_array( $v ) || empty( $v['sortable'] ) ) {
+					continue;
+				}
 				if ( ! empty( $v['default_sort'] ) ) {
-					$func = function (
+					$_priority                     = $this->app->utility->array_get( $v, 'default_sort_priority', 10 );
+					$_orderby                      = $this->app->utility->array_get( $v, 'orderby', "{$table}.{$k}" );
+					$_order                        = $this->app->utility->array_get( $v, 'desc', false ) ? 'DESC' : 'ASC';
+					$_orderby_list[ $_priority ][] = "{$_orderby} {$_order}";
+				}
+			}
+			ksort( $_orderby_list );
+			$_orderby_list   = $this->app->utility->flatten( $_orderby_list );
+			$_orderby_list[] = "{$table}.updated_at DESC";
+
+			$func = function (
+				/** @noinspection PhpUnusedParameterInspection */
+				$orderby, $wp_query
+			) use ( &$func, $_orderby_list ) {
+				/** @var string $orderby */
+				/** @var \WP_Query $wp_query */
+				remove_filter( 'posts_orderby', $func );
+
+				$_orderby_list[] = $orderby;
+
+				return implode( ', ', $_orderby_list );
+			};
+			add_filter( 'posts_orderby', $func, 10, 2 );
+		} else {
+			foreach ( $this->get_manage_posts_columns() as $k => $v ) {
+				if ( ! is_array( $v ) || empty( $v['sortable'] ) ) {
+					continue;
+				}
+				$key = $this->get_post_type() . '-' . $k;
+				if ( $key === $orderby ) {
+					$_order = $wp_query->get( 'order', 'ASC' );
+					$func   = function (
 						/** @noinspection PhpUnusedParameterInspection */
 						$orderby, $wp_query
-					) use ( &$func, $k, $v, $table ) {
+					) use ( &$func, $k, $v, $table, $_order ) {
 						/** @var string $orderby */
 						/** @var \WP_Query $wp_query */
 						remove_filter( 'posts_orderby', $func );
 						$_orderby = $this->app->utility->array_get( $v, 'orderby', "{$table}.{$k}" );
-						$_order   = $this->app->utility->array_get( $v, 'desc', false ) ? 'DESC' : 'ASC';
 
-						return "{$_orderby} {$_order}, {$table}.updated_at DESC, {$orderby}";
+						return "{$_orderby} {$_order}, {$orderby}";
 					};
 					add_filter( 'posts_orderby', $func, 10, 2 );
 					break;
 				}
-			} elseif ( $key === $orderby ) {
-				$_order = $wp_query->get( 'order', 'ASC' );
-				$func   = function (
-					/** @noinspection PhpUnusedParameterInspection */
-					$orderby, $wp_query
-				) use ( &$func, $k, $v, $table, $_order ) {
-					/** @var string $orderby */
-					/** @var \WP_Query $wp_query */
-					remove_filter( 'posts_orderby', $func );
-					$_orderby = $this->app->utility->array_get( $v, 'orderby', "{$table}.{$k}" );
-
-					return "{$_orderby} {$_order}, {$orderby}";
-				};
-				add_filter( 'posts_orderby', $func, 10, 2 );
-				break;
 			}
 		}
 	}
@@ -479,8 +495,7 @@ trait Custom_Post {
 		unset( $columns['memo'] );
 		unset( $columns['word-count'] );
 
-		$_columns     = $this->app->db->get_columns( $this->get_related_table_name() );
-		$default_sort = false;
+		$_columns = $this->app->db->get_columns( $this->get_related_table_name() );
 		foreach ( $this->get_manage_posts_columns() as $k => $v ) {
 			if ( $sortable && ( ! is_array( $v ) || empty( $v['sortable'] ) ) ) {
 				continue;
@@ -492,10 +507,7 @@ trait Custom_Post {
 			$key = $this->get_post_type() . '-' . $k;
 			if ( $sortable ) {
 				$order = ! empty( $v['desc'] );
-				if ( ! $default_sort ) {
-					$default_sort = true;
-					! empty( $v['default_sort'] ) and $order = ! $order;
-				}
+				! empty( $v['default_sort'] ) and $order = ! $order;
 				$columns[ $key ] = [ $key, $order ];
 				continue;
 			}
