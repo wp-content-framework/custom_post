@@ -1117,18 +1117,6 @@ trait Custom_Post {
 
 		return array_map( function ( $d ) use ( $key, $columns ) {
 			$key = $this->table_column_to_name( $key, $columns );
-			/** @noinspection HtmlUnknownTarget */
-			$d = preg_replace_callback( '#\[(https?://([\w-]+\.)+[\w-]+(/[\w-./?%&=\#]*)?)\]\s*\(([^()]+?)\)#', function ( $matches ) {
-				return $this->url( $matches[1], $matches[4], false, true, [], false );
-			}, $d );
-			$d = wp_kses( $d, [
-				'a'      => [ 'href' => true, 'target' => true, 'rel' => true ],
-				'b'      => [],
-				'br'     => [],
-				'sub'    => [],
-				'sup'    => [],
-				'strong' => [],
-			] );
 
 			return "$d: [{$key}]";
 		}, $errors );
