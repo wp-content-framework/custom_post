@@ -275,6 +275,11 @@ interface Custom_Post extends \WP_Framework_Core\Interfaces\Singleton, \WP_Frame
 	public function get_error_messages( $key, array $errors );
 
 	/**
+	 * @return string
+	 */
+	public function get_post_type_link();
+
+	/**
 	 * @param int $post_id
 	 *
 	 * @return string

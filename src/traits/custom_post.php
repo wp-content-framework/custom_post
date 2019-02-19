@@ -1159,17 +1159,24 @@ trait Custom_Post {
 	}
 
 	/**
+	 * @return string
+	 */
+	public function get_post_type_link() {
+		return admin_url( 'edit.php?post_type=' . $this->get_post_type() );
+	}
+
+	/**
 	 * @param int $post_id
 	 *
 	 * @return string
 	 */
 	public function get_edit_post_link( $post_id ) {
 		if ( ! $post = get_post( $post_id ) ) {
-			return admin_url( 'edit.php?post_type=' . $this->get_post_type() );
+			return $this->get_post_type_link();
 		}
 		$post_type_object = get_post_type_object( $post->post_type );
 		if ( ! $post_type_object ) {
-			return admin_url( 'edit.php?post_type=' . $this->get_post_type() );
+			return $this->get_post_type_link();
 		}
 		$action = '&action=edit';
 
