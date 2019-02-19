@@ -411,7 +411,7 @@ trait Custom_Post {
 						$_orderby = $this->app->utility->array_get( $v, 'orderby', "{$table}.{$k}" );
 						$_order   = $this->app->utility->array_get( $v, 'desc', false ) ? 'DESC' : 'ASC';
 
-						return "{$_orderby} {$_order}";
+						return "{$_orderby} {$_order}, {$table}.updated_at DESC, {$orderby}";
 					};
 					add_filter( 'posts_orderby', $func, 10, 2 );
 					break;
