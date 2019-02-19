@@ -2,7 +2,7 @@
 /**
  * WP_Framework_Custom_Post Traits Custom Post
  *
- * @version 0.0.17
+ * @version 0.0.18
  * @author technote-space
  * @copyright technote-space All Rights Reserved
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU General Public License, version 2
@@ -411,7 +411,7 @@ trait Custom_Post {
 						$_orderby = $this->app->utility->array_get( $v, 'orderby', "{$table}.{$k}" );
 						$_order   = $this->app->utility->array_get( $v, 'desc', false ) ? 'DESC' : 'ASC';
 
-						return "{$_orderby} {$_order}";
+						return "{$_orderby} {$_order}, {$table}.updated_at DESC, {$orderby}";
 					};
 					add_filter( 'posts_orderby', $func, 10, 2 );
 					break;
@@ -1117,18 +1117,6 @@ trait Custom_Post {
 
 		return array_map( function ( $d ) use ( $key, $columns ) {
 			$key = $this->table_column_to_name( $key, $columns );
-			/** @noinspection HtmlUnknownTarget */
-			$d = preg_replace_callback( '#\[(https?://([\w-]+\.)+[\w-]+(/[\w-./?%&=\#]*)?)\]\s*\(([^()]+?)\)#', function ( $matches ) {
-				return $this->url( $matches[1], $matches[4], false, true, [], false );
-			}, $d );
-			$d = wp_kses( $d, [
-				'a'      => [ 'href' => true, 'target' => true, 'rel' => true ],
-				'b'      => [],
-				'br'     => [],
-				'sub'    => [],
-				'sup'    => [],
-				'strong' => [],
-			] );
 
 			return "$d: [{$key}]";
 		}, $errors );
@@ -1171,17 +1159,24 @@ trait Custom_Post {
 	}
 
 	/**
+	 * @return string
+	 */
+	public function get_post_type_link() {
+		return admin_url( 'edit.php?post_type=' . $this->get_post_type() );
+	}
+
+	/**
 	 * @param int $post_id
 	 *
 	 * @return string
 	 */
 	public function get_edit_post_link( $post_id ) {
 		if ( ! $post = get_post( $post_id ) ) {
-			return admin_url( 'edit.php?post_type=' . $this->get_post_type() );
+			return $this->get_post_type_link();
 		}
 		$post_type_object = get_post_type_object( $post->post_type );
 		if ( ! $post_type_object ) {
-			return admin_url( 'edit.php?post_type=' . $this->get_post_type() );
+			return $this->get_post_type_link();
 		}
 		$action = '&action=edit';
 
