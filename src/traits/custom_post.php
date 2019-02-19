@@ -396,33 +396,33 @@ trait Custom_Post {
 		$table   = $this->app->db->get_table( $this->get_related_table_name() );
 
 		if ( empty( $orderby ) ) {
-			$_orderby = [];
+			$_orderby_list = [];
 			foreach ( $this->get_manage_posts_columns() as $k => $v ) {
 				if ( ! is_array( $v ) || empty( $v['sortable'] ) ) {
 					continue;
 				}
 				if ( ! empty( $v['default_sort'] ) ) {
-					$priority                = $this->app->utility->array_get( $v, 'default_sort_priority', 10 );
-					$orderby                 = $this->app->utility->array_get( $v, 'orderby', "{$table}.{$k}" );
-					$_order                  = $this->app->utility->array_get( $v, 'desc', false ) ? 'DESC' : 'ASC';
-					$_orderby[ $priority ][] = "{$orderby} {$_order}";
+					$_priority                     = $this->app->utility->array_get( $v, 'default_sort_priority', 10 );
+					$_orderby                      = $this->app->utility->array_get( $v, 'orderby', "{$table}.{$k}" );
+					$_order                        = $this->app->utility->array_get( $v, 'desc', false ) ? 'DESC' : 'ASC';
+					$_orderby_list[ $_priority ][] = "{$_orderby} {$_order}";
 				}
 			}
-			ksort( $_orderby );
-			$_orderby   = $this->app->utility->flatten( $_orderby );
-			$_orderby[] = "{$table}.updated_at DESC";
+			ksort( $_orderby_list );
+			$_orderby_list   = $this->app->utility->flatten( $_orderby_list );
+			$_orderby_list[] = "{$table}.updated_at DESC";
 
 			$func = function (
 				/** @noinspection PhpUnusedParameterInspection */
 				$orderby, $wp_query
-			) use ( &$func, $_orderby ) {
+			) use ( &$func, $_orderby_list ) {
 				/** @var string $orderby */
 				/** @var \WP_Query $wp_query */
 				remove_filter( 'posts_orderby', $func );
 
-				$_orderby[] = $orderby;
+				$_orderby_list[] = $orderby;
 
-				return implode( ', ', $_orderby );
+				return implode( ', ', $_orderby_list );
 			};
 			add_filter( 'posts_orderby', $func, 10, 2 );
 		} else {
