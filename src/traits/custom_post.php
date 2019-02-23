@@ -391,7 +391,11 @@ trait Custom_Post {
 	/**
 	 * @param \WP_Query $wp_query
 	 */
-	public function pre_get_posts( $wp_query ) {
+	public function setup_posts_orderby( $wp_query ) {
+		if ( method_exists( $this, 'pre_get_posts' ) ) {
+			return;
+		}
+
 		$orderby = $wp_query->get( 'orderby' );
 		$table   = $this->app->db->get_table( $this->get_related_table_name() );
 

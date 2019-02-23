@@ -126,7 +126,7 @@ interface Custom_Post extends \WP_Framework_Core\Interfaces\Singleton, \WP_Frame
 	/**
 	 * @param \WP_Query $wp_query
 	 */
-	public function pre_get_posts( $wp_query );
+	public function setup_posts_orderby( $wp_query );
 
 	/**
 	 * @param array $columns

@@ -38,7 +38,7 @@ return [
 			'posts_search',
 		],
 		'pre_get_posts'                => [
-			'pre_get_posts',
+			'setup_posts_orderby',
 		],
 		'save_post'                    => [
 			'save_post',
