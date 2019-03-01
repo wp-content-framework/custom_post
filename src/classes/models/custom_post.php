@@ -551,18 +551,22 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 	}
 
 	/**
-	 * @param string $post_type
+	 * @param string|array $post_type
 	 *
 	 * @return bool
 	 */
 	public function is_valid_custom_post_type( $post_type ) {
+		if ( is_array( $post_type ) ) {
+			return false;
+		}
+
 		$custom_posts = $this->get_custom_posts();
 
 		return isset( $custom_posts[ $post_type ] );
 	}
 
 	/**
-	 * @param string $post_type
+	 * @param string|array $post_type
 	 *
 	 * @return \WP_Framework_Custom_Post\Interfaces\Custom_Post|null
 	 */
