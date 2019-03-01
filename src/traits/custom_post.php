@@ -70,15 +70,10 @@ trait Custom_Post {
 			return;
 		}
 		add_filter( "views_edit-{$post_type}", function ( $views ) {
-			unset( $views['mine'] );
-			unset( $views['publish'] );
-
-			return $views;
+			return $this->view_edit( $views );
 		} );
 		add_filter( "bulk_actions-edit-{$post_type}", function ( $actions ) {
-			unset( $actions['edit'] );
-
-			return $actions;
+			return $this->bulk_actions( $actions );
 		} );
 		add_filter( "manage_edit-{$post_type}_sortable_columns", function ( $sortable_columns ) {
 			return $this->manage_posts_columns( $sortable_columns, true );
@@ -500,6 +495,50 @@ trait Custom_Post {
 		/** @noinspection PhpUnusedParameterInspection */
 		array $actions, \WP_Post $post
 	) {
+		return $actions;
+	}
+
+	/**
+	 * @param array $views
+	 *
+	 * @return array
+	 */
+	protected function view_edit( array $views ) {
+		unset( $views['mine'] );
+		unset( $views['publish'] );
+
+		return $this->filter_view_edit( $views );
+	}
+
+	/**
+	 * @param array $views
+	 *
+	 * @return array
+	 */
+	protected function filter_view_edit( array $views ) {
+		return $views;
+	}
+
+	/**
+	 * @param array $actions
+	 *
+	 * @return array
+	 */
+	protected function bulk_actions( array $actions ) {
+		unset( $actions['edit'] );
+		if ( $this->is_support_export() ) {
+			$actions['export'] = $this->translate( 'Export' );
+		}
+
+		return $this->filter_bulk_actions( $actions );
+	}
+
+	/**
+	 * @param array $actions
+	 *
+	 * @return array
+	 */
+	protected function filter_bulk_actions( array $actions ) {
 		return $actions;
 	}
 	/**
