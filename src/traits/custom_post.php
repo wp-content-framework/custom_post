@@ -822,6 +822,7 @@ trait Custom_Post {
 		$posts    = get_posts( [
 			'include'     => $post_ids,
 			'post_type'   => $this->get_post_type(),
+			'post_status' => 'any',
 		] );
 		$posts    = $this->app->utility->array_combine( $posts, 'ID' );
 
