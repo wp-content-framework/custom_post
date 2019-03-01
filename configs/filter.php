@@ -65,6 +65,9 @@ return [
 		'redirect_post_location'       => [
 			'redirect_post_location',
 		],
+		'load-edit.php'                => [
+			'setup_list',
+		],
 		'load-post.php'                => [
 			'setup_page',
 			'set_admin_notices',
