@@ -108,6 +108,14 @@ interface Custom_Post extends \WP_Framework_Core\Interfaces\Singleton, \WP_Frame
 	public function get_post_type_position();
 
 	/**
+	 * @param array $actions
+	 * @param \WP_Post $post
+	 *
+	 * @return array
+	 */
+	public function post_row_actions( array $actions, \WP_Post $post );
+
+	/**
 	 * @param string $search
 	 * @param \WP_Query $wp_query
 	 *

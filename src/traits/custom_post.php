@@ -70,16 +70,14 @@ trait Custom_Post {
 			return;
 		}
 		add_filter( "views_edit-{$post_type}", function ( $views ) {
-			unset( $views['mine'] );
-			unset( $views['publish'] );
-
-			return $views;
+			return $this->view_edit( $views );
 		} );
 		add_filter( "bulk_actions-edit-{$post_type}", function ( $actions ) {
-			unset( $actions['edit'] );
-
-			return $actions;
+			return $this->bulk_actions( $actions );
 		} );
+		add_filter( "handle_bulk_actions-edit-{$post_type}", function ( $sendback, $doaction, $post_ids ) {
+			return $this->handle_bulk_actions( $sendback, $doaction, (array) $post_ids );
+		}, 10, 3 );
 		add_filter( "manage_edit-{$post_type}_sortable_columns", function ( $sortable_columns ) {
 			return $this->manage_posts_columns( $sortable_columns, true );
 		} );
@@ -456,6 +454,108 @@ trait Custom_Post {
 	}
 
 	/**
+	 * @param array $actions
+	 * @param \WP_Post $post
+	 *
+	 * @return array
+	 */
+	public function post_row_actions( array $actions, \WP_Post $post ) {
+		unset( $actions['inline hide-if-no-js'] );
+		unset( $actions['edit'] );
+		unset( $actions['clone'] );
+		unset( $actions['edit_as_new_draft'] );
+		if ( ! $this->user_can( 'delete_posts' ) ) {
+			unset( $actions['trash'] );
+		}
+
+		$row_actions = $this->get_post_row_actions();
+		foreach ( $row_actions as $key => $value ) {
+			$actions[ $key ] = $this->url( wp_nonce_url( add_query_arg( [
+				'action'    => $key,
+				'post_type' => $this->get_post_type(),
+				'ids'       => $post->ID,
+			], admin_url( 'edit.php' ) ), 'bulk-posts' ), $value, true, false, [], false );
+		}
+
+		return $this->filter_post_row_actions( $actions, $post );
+	}
+
+	/**
+	 * @return array
+	 */
+	protected function get_post_row_actions() {
+		return [];
+	}
+
+	/**
+	 * @param array $actions
+	 * @param \WP_Post $post
+	 *
+	 * @return array
+	 */
+	protected function filter_post_row_actions(
+		/** @noinspection PhpUnusedParameterInspection */
+		array $actions, \WP_Post $post
+	) {
+		return $actions;
+	}
+
+	/**
+	 * @param array $views
+	 *
+	 * @return array
+	 */
+	protected function view_edit( array $views ) {
+		unset( $views['mine'] );
+		unset( $views['publish'] );
+
+		return $this->filter_view_edit( $views );
+	}
+
+	/**
+	 * @param array $views
+	 *
+	 * @return array
+	 */
+	protected function filter_view_edit( array $views ) {
+		return $views;
+	}
+
+	/**
+	 * @param array $actions
+	 *
+	 * @return array
+	 */
+	protected function bulk_actions( array $actions ) {
+		unset( $actions['edit'] );
+
+		return $this->filter_bulk_actions( $actions );
+	}
+
+	/**
+	 * @param array $actions
+	 *
+	 * @return array
+	 */
+	protected function filter_bulk_actions( array $actions ) {
+		return $actions;
+	}
+
+	/**
+	 * @param string $sendback
+	 * @param string $doaction
+	 * @param array $post_ids
+	 *
+	 * @return string
+	 */
+	protected function handle_bulk_actions(
+		/** @noinspection PhpUnusedParameterInspection */
+		$sendback, $doaction, array $post_ids
+	) {
+		return $sendback;
+	}
+
+	/**
 	 * @param array $columns
 	 * @param bool $sortable
 	 *
@@ -720,8 +820,8 @@ trait Custom_Post {
 
 		$post_ids = $this->app->utility->array_pluck( $list, 'post_id' );
 		$posts    = get_posts( [
-			'include'   => $post_ids,
-			'post_type' => $this->get_post_type(),
+			'include'     => $post_ids,
+			'post_type'   => $this->get_post_type(),
 			'post_status' => 'any',
 		] );
 		$posts    = $this->app->utility->array_combine( $posts, 'ID' );
