@@ -1295,6 +1295,13 @@ trait Custom_Post {
 	}
 
 	/**
+	 * setup list
+	 */
+	public function setup_list() {
+
+	}
+
+	/**
 	 * setup page
 	 */
 	public function setup_page() {
