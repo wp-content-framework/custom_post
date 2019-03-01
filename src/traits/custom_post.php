@@ -80,6 +80,9 @@ trait Custom_Post {
 
 			return $actions;
 		} );
+		add_filter( "handle_bulk_actions-edit-{$post_type}", function ( $sendback, $doaction, $post_ids ) {
+			return $this->handle_bulk_actions( $sendback, $doaction, (array) $post_ids );
+		}, 10, 3 );
 		add_filter( "manage_edit-{$post_type}_sortable_columns", function ( $sortable_columns ) {
 			return $this->manage_posts_columns( $sortable_columns, true );
 		} );
@@ -455,6 +458,20 @@ trait Custom_Post {
 		}
 	}
 
+
+	/**
+	 * @param string $sendback
+	 * @param string $doaction
+	 * @param array $post_ids
+	 *
+	 * @return string
+	 */
+	protected function handle_bulk_actions(
+		/** @noinspection PhpUnusedParameterInspection */
+		$sendback, $doaction, array $post_ids
+	) {
+		return $sendback;
+	}
 	/**
 	 * @param array $columns
 	 * @param bool $sortable
