@@ -454,6 +454,13 @@ trait Custom_Post {
 	}
 
 	/**
+	 * @return bool
+	 */
+	public function is_support_io() {
+		return ! empty( $this->app->get_config( 'io', $this->get_post_type_slug() ) );
+	}
+
+	/**
 	 * @param array $actions
 	 * @param \WP_Post $post
 	 *
@@ -469,6 +476,9 @@ trait Custom_Post {
 		}
 
 		$row_actions = $this->get_post_row_actions();
+		if ( $this->is_support_io() ) {
+			$row_actions['export'] = 'Export';
+		}
 		foreach ( $row_actions as $key => $value ) {
 			$actions[ $key ] = $this->url( wp_nonce_url( add_query_arg( [
 				'action'    => $key,
@@ -528,6 +538,9 @@ trait Custom_Post {
 	 */
 	protected function bulk_actions( array $actions ) {
 		unset( $actions['edit'] );
+		if ( $this->is_support_io() ) {
+			$actions['export'] = $this->translate( 'Export' );
+		}
 
 		return $this->filter_bulk_actions( $actions );
 	}
@@ -552,7 +565,68 @@ trait Custom_Post {
 		/** @noinspection PhpUnusedParameterInspection */
 		$sendback, $doaction, array $post_ids
 	) {
+		if ( 'export' === $doaction && $this->is_support_io() ) {
+			$this->export( $post_ids );
+		}
+
 		return $sendback;
+	}
+
+	/**
+	 * @param array $post_ids
+	 */
+	private function export( $post_ids ) {
+		$data    = [];
+		$setting = $this->app->get_config( 'io', $this->get_post_type_slug() );
+		foreach (
+			$this->list_data( false, null, 1, [
+				'p.ID' => [ 'IN', $post_ids ],
+			] )['data'] as $d
+		) {
+			$convert = [];
+			foreach ( $setting as $k => $v ) {
+				if ( ! is_array( $v ) ) {
+					$k = $v;
+					$v = [];
+				}
+				if ( ! array_key_exists( $k, $d ) ) {
+					continue;
+				}
+				if ( isset( $v['export'] ) && is_callable( $v['export'] ) ) {
+					$convert[ $k ] = ( $v['export'] )( $d[ $k ] );
+				} else {
+					$convert[ $k ] = $d[ $k ];
+				}
+			}
+			$data[] = $convert;
+		}
+
+		$this->output_json_file( $data );
+		exit;
+	}
+
+	/**
+	 * @param array $data
+	 */
+	private function output_json_file( $data ) {
+		if ( ! class_exists( "\Services_JSON" ) ) {
+			require_once( ABSPATH . WPINC . '/class-json.php' );
+		}
+
+		$json = @json_encode( $data );
+		header( 'Content-Type: application/json' );
+		header( 'Content-Length: ' . strlen( $json ) );
+		header( 'Content-Disposition: attachment; filename="' . $this->get_export_filename() . '"' );
+		header( 'Pragma: no-cache' );
+		header( 'Cache-Control: no-cache' );
+		echo $json;
+	}
+
+	/**
+	 * @return string
+	 */
+	private function get_export_filename() {
+		return $this->app->utility->replace_time( $this->apply_filters( 'export_filename', 'export${Y}${m}${d}${H}${i}${s}' ) ) . '.json';
 	}
 
 	/**
