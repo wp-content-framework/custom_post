@@ -91,16 +91,11 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 	 * @return array
 	 */
 	/** @noinspection PhpUnusedPrivateMethodInspection */
-	private function delete_edit_links( array $actions, \WP_Post $post ) {
+	private function post_row_actions( array $actions, \WP_Post $post ) {
 		if ( $this->is_valid_custom_post_type( $post->post_type ) ) {
 			$custom_post = $this->get_custom_post_type( $post->post_type );
-			unset( $actions['inline hide-if-no-js'] );
-			unset( $actions['edit'] );
-			unset( $actions['clone'] );
-			unset( $actions['edit_as_new_draft'] );
-			if ( ! $custom_post->user_can( 'delete_posts' ) ) {
-				unset( $actions['trash'] );
-			}
+
+			return $custom_post->post_row_actions( $actions, $post );
 		}
 
 		return $actions;
