@@ -26,7 +26,7 @@ return [
 			'manage_posts_custom_column',
 		],
 		'post_row_actions'             => [
-			'delete_edit_links',
+			'post_row_actions',
 		],
 		'wp_count_posts'               => [
 			'wp_count_posts',

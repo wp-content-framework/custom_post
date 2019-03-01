@@ -455,6 +455,53 @@ trait Custom_Post {
 		}
 	}
 
+
+	/**
+	 * @param array $actions
+	 * @param \WP_Post $post
+	 *
+	 * @return array
+	 */
+	public function post_row_actions( array $actions, \WP_Post $post ) {
+		unset( $actions['inline hide-if-no-js'] );
+		unset( $actions['edit'] );
+		unset( $actions['clone'] );
+		unset( $actions['edit_as_new_draft'] );
+		if ( ! $this->user_can( 'delete_posts' ) ) {
+			unset( $actions['trash'] );
+		}
+
+		$row_actions = $this->get_post_row_actions();
+		foreach ( $row_actions as $key => $value ) {
+			$actions[ $key ] = $this->url( wp_nonce_url( add_query_arg( [
+				'action'    => $key,
+				'post_type' => $this->get_post_type(),
+				'ids'       => $post->ID,
+			], admin_url( 'edit.php' ) ), 'bulk-posts' ), $value, true, false, [], false );
+		}
+
+		return $this->filter_post_row_actions( $actions, $post );
+	}
+
+	/**
+	 * @return array
+	 */
+	protected function get_post_row_actions() {
+		return [];
+	}
+
+	/**
+	 * @param array $actions
+	 * @param \WP_Post $post
+	 *
+	 * @return array
+	 */
+	protected function filter_post_row_actions(
+		/** @noinspection PhpUnusedParameterInspection */
+		array $actions, \WP_Post $post
+	) {
+		return $actions;
+	}
 	/**
 	 * @param array $columns
 	 * @param bool $sortable
