@@ -453,7 +453,6 @@ trait Custom_Post {
 		}
 	}
 
-
 	/**
 	 * @param array $actions
 	 * @param \WP_Post $post
@@ -529,9 +528,6 @@ trait Custom_Post {
 	 */
 	protected function bulk_actions( array $actions ) {
 		unset( $actions['edit'] );
-		if ( $this->is_support_export() ) {
-			$actions['export'] = $this->translate( 'Export' );
-		}
 
 		return $this->filter_bulk_actions( $actions );
 	}
@@ -558,6 +554,7 @@ trait Custom_Post {
 	) {
 		return $sendback;
 	}
+
 	/**
 	 * @param array $columns
 	 * @param bool $sortable
