@@ -576,14 +576,23 @@ trait Custom_Post {
 	 * @param array $post_ids
 	 */
 	private function export( $post_ids ) {
-		$data    = [];
-		$setting = $this->app->get_config( 'io', $this->get_post_type_slug() );
+		$export_data = [];
+		$setting     = $this->app->get_config( 'io', $this->get_post_type_slug() );
 		foreach (
 			$this->list_data( false, null, 1, [
 				'p.ID' => [ 'IN', $post_ids ],
 			] )['data'] as $d
 		) {
-			$convert = [];
+			$data = [];
+			if ( in_array( 'title', $this->get_post_type_supports() ) ) {
+				$data['post_title'] = $d['post']->post_title;
+			}
+			if ( in_array( 'editor', $this->get_post_type_supports() ) ) {
+				$data['post_title'] = $d['post']->post_content;
+			}
+			if ( in_array( 'excerpt', $this->get_post_type_supports() ) ) {
+				$data['post_title'] = $d['post']->post_excerpt;
+			}
 			foreach ( $setting as $k => $v ) {
 				if ( ! is_array( $v ) ) {
 					$k = $v;
@@ -593,15 +602,15 @@ trait Custom_Post {
 					continue;
 				}
 				if ( isset( $v['export'] ) && is_callable( $v['export'] ) ) {
-					$convert[ $k ] = ( $v['export'] )( $d[ $k ] );
+					$data[ $k ] = ( $v['export'] )( $d[ $k ] );
 				} else {
-					$convert[ $k ] = $d[ $k ];
+					$data[ $k ] = $d[ $k ];
 				}
 			}
-			$data[] = $convert;
+			$export_data[] = $data;
 		}
 
-		$this->output_json_file( $data );
+		$this->output_json_file( $export_data );
 		exit;
 	}
 
