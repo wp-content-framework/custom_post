@@ -426,6 +426,12 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 		if ( ! empty( $typenow ) && $this->is_valid_custom_post_type( $typenow ) ) {
 			$custom_post = $this->get_custom_post_type( $typenow );
 			if ( ! empty( $custom_post ) ) {
+				if ( $custom_post->is_support_io() ) {
+					$this->add_style_view( 'admin/style/import_custom_post' );
+					$this->add_script_view( 'admin/script/import_custom_post', [ 'post_type' => $custom_post->get_post_type() ] );
+					$this->setup_modal();
+					$this->app->api->add_use_api_name( 'import_custom_post' );
+				}
 				$custom_post->setup_list();
 			}
 		}
@@ -617,6 +623,15 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 	 */
 	public function get_validation_errors() {
 		return $this->_validation_errors;
+	}
+
+	/**
+	 * @param array $data
+	 *
+	 * @return string
+	 */
+	public function get_import_result( array $data ) {
+		return $this->get_view( 'admin/import_custom_post', $data );
 	}
 
 	/**

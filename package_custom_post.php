@@ -43,6 +43,13 @@ class Package_Custom_Post extends Package_Base {
 	}
 
 	/**
+	 * @return bool
+	 */
+	protected function is_valid_api() {
+		return true;
+	}
+
+	/**
 	 * @return array
 	 */
 	public function get_configs() {

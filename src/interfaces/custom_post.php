@@ -39,6 +39,14 @@ interface Custom_Post extends \WP_Framework_Core\Interfaces\Singleton, \WP_Frame
 	public function update( array $data, array $where, $convert_name = true );
 
 	/**
+	 * @param array $data
+	 * @param bool $convert_name
+	 *
+	 * @return array
+	 */
+	public function validate_insert( array $data, $convert_name = true );
+
+	/**
 	 * @return string
 	 */
 	public function get_post_type_slug();
@@ -108,14 +116,6 @@ interface Custom_Post extends \WP_Framework_Core\Interfaces\Singleton, \WP_Frame
 	public function get_post_type_position();
 
 	/**
-	 * @param array $actions
-	 * @param \WP_Post $post
-	 *
-	 * @return array
-	 */
-	public function post_row_actions( array $actions, \WP_Post $post );
-
-	/**
 	 * @param string $search
 	 * @param \WP_Query $wp_query
 	 *
@@ -135,6 +135,19 @@ interface Custom_Post extends \WP_Framework_Core\Interfaces\Singleton, \WP_Frame
 	 * @param \WP_Query $wp_query
 	 */
 	public function setup_posts_orderby( $wp_query );
+
+	/**
+	 * @return bool
+	 */
+	public function is_support_io();
+
+	/**
+	 * @param array $actions
+	 * @param \WP_Post $post
+	 *
+	 * @return array
+	 */
+	public function post_row_actions( array $actions, \WP_Post $post );
 
 	/**
 	 * @param array $columns
