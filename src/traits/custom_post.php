@@ -94,6 +94,7 @@ trait Custom_Post {
 		$_data['post_type']    = $this->get_post_type();
 		$_data['post_title']   = $this->app->utility->array_get( $data, 'post_title', '' );
 		$_data['post_content'] = $this->app->utility->array_get( $data, 'post_content', '' );
+		$_data['post_excerpt'] = $this->app->utility->array_get( $data, 'post_excerpt', '' );
 		$_data['post_status']  = $this->app->utility->array_get( $data, 'post_status', 'publish' );
 		unset( $data['post_type'] );
 		unset( $data['post_title'] );
@@ -155,6 +156,37 @@ trait Custom_Post {
 		}
 
 		return wp_update_post( $_data );
+	}
+
+	/**
+	 * @param array $data
+	 * @param bool $convert_name
+	 *
+	 * @return array
+	 */
+	public function validate_insert( array $data, $convert_name = true ) {
+		$_data                 = [];
+		$_data['post_type']    = $this->get_post_type();
+		$_data['post_title']   = $this->app->utility->array_get( $data, 'post_title', '' );
+		$_data['post_content'] = $this->app->utility->array_get( $data, 'post_content', '' );
+		$_data['post_excerpt'] = $this->app->utility->array_get( $data, 'post_excerpt', '' );
+		$_data['post_status']  = $this->app->utility->array_get( $data, 'post_status', 'publish' );
+		unset( $data['post_type'] );
+		unset( $data['post_title'] );
+		unset( $data['post_content'] );
+		unset( $data['post_status'] );
+
+		foreach ( $this->get_data_field_settings() as $k => $v ) {
+			$name = $convert_name ? $this->get_post_field_name( $k ) : $k;
+			$this->app->input->delete_post( $name );
+		}
+		foreach ( $data as $k => $v ) {
+			$name           = $convert_name ? $this->get_post_field_name( $k ) : $k;
+			$_data[ $name ] = $v;
+			$this->app->input->set_post( $name, $v );
+		}
+
+		return $this->validate_input( $_data );
 	}
 
 	/**
@@ -457,7 +489,7 @@ trait Custom_Post {
 	 * @return bool
 	 */
 	public function is_support_io() {
-		return ! empty( $this->app->get_config( 'io', $this->get_post_type_slug() ) );
+		return ! empty( $this->app->get_config( 'io', $this->get_post_type_slug() ) ) && $this->user_can( 'edit_others_posts' );
 	}
 
 	/**
@@ -477,7 +509,7 @@ trait Custom_Post {
 
 		$row_actions = $this->get_post_row_actions();
 		if ( $this->is_support_io() ) {
-			$row_actions['export'] = 'Export';
+			$row_actions['export'] = 'Export as JSON';
 		}
 		foreach ( $row_actions as $key => $value ) {
 			$actions[ $key ] = $this->url( wp_nonce_url( add_query_arg( [
@@ -539,7 +571,7 @@ trait Custom_Post {
 	protected function bulk_actions( array $actions ) {
 		unset( $actions['edit'] );
 		if ( $this->is_support_io() ) {
-			$actions['export'] = $this->translate( 'Export' );
+			$actions['export'] = $this->translate( 'Export as JSON' );
 		}
 
 		return $this->filter_bulk_actions( $actions );
@@ -565,7 +597,7 @@ trait Custom_Post {
 		/** @noinspection PhpUnusedParameterInspection */
 		$sendback, $doaction, array $post_ids
 	) {
-		if ( 'export' === $doaction && $this->is_support_io() ) {
+		if ( ! empty( $post_ids ) && 'export' === $doaction && $this->is_support_io() ) {
 			$this->export( $post_ids );
 		}
 
@@ -588,10 +620,10 @@ trait Custom_Post {
 				$data['post_title'] = $d['post']->post_title;
 			}
 			if ( in_array( 'editor', $this->get_post_type_supports() ) ) {
-				$data['post_title'] = $d['post']->post_content;
+				$data['post_content'] = $d['post']->post_content;
 			}
 			if ( in_array( 'excerpt', $this->get_post_type_supports() ) ) {
-				$data['post_title'] = $d['post']->post_excerpt;
+				$data['post_excerpt'] = $d['post']->post_excerpt;
 			}
 			foreach ( $setting as $k => $v ) {
 				if ( ! is_array( $v ) ) {
@@ -618,10 +650,6 @@ trait Custom_Post {
 	 * @param array $data
 	 */
 	private function output_json_file( $data ) {
-		if ( ! class_exists( "\Services_JSON" ) ) {
-			require_once( ABSPATH . WPINC . '/class-json.php' );
-		}
-
 		$json = @json_encode( $data );
 		header( 'Content-Type: application/json' );
 		header( 'Content-Length: ' . strlen( $json ) );
