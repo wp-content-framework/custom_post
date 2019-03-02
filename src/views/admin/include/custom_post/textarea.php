@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Framework_Core Views Admin Include Custom Post Textarea
+ * WP_Framework_Custom_Post Views Admin Include Custom Post Textarea
  *
  * @version 0.0.1
  * @author technote-space
