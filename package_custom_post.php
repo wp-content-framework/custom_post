@@ -25,7 +25,7 @@ class Package_Custom_Post extends Package_Base {
 	 * @return int
 	 */
 	public function get_priority() {
-		return 20;
+		return 120;
 	}
 
 	/**

@@ -8,7 +8,7 @@
 
 # 要件
 - PHP 5.6 以上
-- WordPress 3.9.3 以上
+- WordPress 4.6 以上
 
 # インストール
 
