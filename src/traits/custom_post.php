@@ -601,6 +601,20 @@ trait Custom_Post {
 			$this->export( $post_ids );
 		}
 
+		return $this->filter_handle_bulk_actions( $sendback, $doaction, $post_ids );
+	}
+
+	/**
+	 * @param string $sendback
+	 * @param string $doaction
+	 * @param array $post_ids
+	 *
+	 * @return string
+	 */
+	protected function filter_handle_bulk_actions(
+		/** @noinspection PhpUnusedParameterInspection */
+		$sendback, $doaction, array $post_ids
+	) {
 		return $sendback;
 	}
 
