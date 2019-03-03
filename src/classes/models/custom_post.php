@@ -626,15 +626,6 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 	}
 
 	/**
-	 * @param array $data
-	 *
-	 * @return string
-	 */
-	public function get_import_result( array $data ) {
-		return $this->get_view( 'admin/import_custom_post', $data );
-	}
-
-	/**
 	 * delete posts
 	 */
 	public function uninstall() {

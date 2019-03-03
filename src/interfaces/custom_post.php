@@ -150,6 +150,18 @@ interface Custom_Post extends \WP_Framework_Core\Interfaces\Singleton, \WP_Frame
 	public function post_row_actions( array $actions, \WP_Post $post );
 
 	/**
+	 * @param mixed $data
+	 *
+	 * @return array {
+	 *  int $result
+	 *  string $message
+	 *  int $success
+	 *  int $fail
+	 * }
+	 */
+	public function import( $data );
+
+	/**
 	 * @param array $columns
 	 * @param bool $sortable
 	 *
