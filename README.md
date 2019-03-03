@@ -30,6 +30,10 @@
 ## カスタム投稿タイプの追加
 今後追加予定
 
+## エクスポートとインポート
+今後追加予定
+
 # Author
 
-[technote-space](https://github.com/technote-space)
+[GitHub (Technote)](https://github.com/technote-space)  
+[Blog](https://technote.space)
