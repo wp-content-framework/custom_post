@@ -28,6 +28,9 @@ return [
 		'post_row_actions'             => [
 			'post_row_actions',
 		],
+		'page_row_actions'             => [
+			'post_row_actions',
+		],
 		'wp_count_posts'               => [
 			'wp_count_posts',
 		],
