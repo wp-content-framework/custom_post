@@ -489,7 +489,9 @@ trait Custom_Post {
 	 * @return bool
 	 */
 	public function is_support_io() {
-		return ! empty( $this->app->get_config( 'io', $this->get_post_type_slug() ) ) && $this->user_can( 'edit_others_posts' );
+		global $wp_version;
+
+		return version_compare( $wp_version, '4.7', '>=' ) && ! empty( $this->app->get_config( 'io', $this->get_post_type_slug() ) ) && $this->user_can( 'edit_others_posts' );
 	}
 
 	/**
