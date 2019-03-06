@@ -676,7 +676,7 @@ trait Custom_Post {
 		header( 'Content-Disposition: attachment; filename="' . $this->get_export_filename() . '"' );
 		header( 'Pragma: no-cache' );
 		header( 'Cache-Control: no-cache' );
-		echo $json;
+		$this->h( $json, false, true, false );
 	}
 
 	/**
