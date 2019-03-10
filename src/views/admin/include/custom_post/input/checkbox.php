@@ -2,7 +2,7 @@
 /**
  * WP_Framework_Custom_Post Views Admin Include Custom Post Input Checkbox
  *
- * @version 0.0.21
+ * @version 0.0.25
  * @author Technote
  * @copyright Technote All Rights Reserved
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU General Public License, version 2
@@ -24,6 +24,6 @@ $val     = $instance->old( $prefix . $name, $data, $name, $default, true ) - 0;
 	'name'    => $prefix . $name,
 	'id'      => $prefix . $name,
 	'value'   => 1,
-	'label'   => $instance->app->utility->array_get( $column, 'label', $instance->app->utility->array_get( $column, 'comment', $column['name'] ) ),
+	'label'   => $instance->app->utility->array_search( $column, 'label', 'comment', 'name', '' ),
 	'checked' => ! empty( $val ),
 ], $instance->app->utility->array_get( $column, 'args', [] ) ); ?>
