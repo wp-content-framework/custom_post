@@ -24,6 +24,6 @@ $val     = $instance->old( $prefix . $name, $data, $name, $default, true ) - 0;
 	'name'    => $prefix . $name,
 	'id'      => $prefix . $name,
 	'value'   => 1,
-	'label'   => $instance->app->utility->array_get( $column, 'label', $instance->app->utility->array_get( $column, 'comment', $column['name'] ) ),
+	'label'   => $instance->app->utility->array_get( $column, 'label', $instance->app->utility->array_search( $column, 'comment', 'name', '' ) ),
 	'checked' => ! empty( $val ),
 ], $instance->app->utility->array_get( $column, 'args', [] ) ); ?>
