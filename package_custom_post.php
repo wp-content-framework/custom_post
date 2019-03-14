@@ -55,6 +55,7 @@ class Package_Custom_Post extends Package_Base {
 	public function get_configs() {
 		return [
 			'config',
+			'deprecated',
 			'filter',
 			'map',
 			'slug',
