@@ -250,11 +250,17 @@ trait Custom_Post {
 	 * @return array
 	 */
 	public function get_post_type_args( $capabilities = null ) {
+		$save = false;
 		if ( ! isset( $capabilities ) ) {
+			$cache = $this->cache_get( 'post_type_args' );
+			if ( is_array( $cache ) ) {
+				return $cache;
+			}
+			$save         = true;
 			$capabilities = $this->get_capabilities();
 		}
 
-		return $this->apply_custom_post_filters( 'args', [
+		$args = $this->apply_custom_post_filters( 'args', [
 			'labels'              => $this->get_post_type_labels(),
 			'description'         => '',
 			'public'              => false,
@@ -272,6 +278,12 @@ trait Custom_Post {
 			'supports'            => $this->get_post_type_supports(),
 			'menu_position'       => $this->get_post_type_position(),
 		] );
+
+		if ( $save ) {
+			$this->cache_set( 'post_type_args', $args );
+		}
+
+		return $args;
 	}
 
 	/**
