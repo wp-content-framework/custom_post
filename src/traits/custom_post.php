@@ -712,6 +712,9 @@ trait Custom_Post {
 	 * }
 	 */
 	public function import( $data ) {
+		if ( ! $this->is_support_io() ) {
+			return [ 0, $this->translate( 'JSON Import is not supported.' ), 0, 0 ];
+		}
 		if ( empty( $data ) ) {
 			return [ 0, $this->translate( 'Invalid JSON file' ), 0, 0 ];
 		}
@@ -1109,7 +1112,7 @@ trait Custom_Post {
 		$params = [];
 		foreach ( $this->get_data_field_settings() as $k => $v ) {
 			$params[ $k ] = $this->get_post_field( $k, $update || ! $v['required'] ? null : $v['default'], null, $v );
-			$params[ $k ] = $this->sanitize_input( $params[ $k ], $v['type'] );
+			$params[ $k ] = $this->sanitize_input( $params[ $k ], $v['type'], ! $update && $v['unset_if_null'] );
 			if ( ! isset( $params[ $k ] ) && ! $update && $v['unset_if_null'] ) {
 				unset( $params[ $k ] );
 				continue;
@@ -1203,7 +1206,7 @@ trait Custom_Post {
 			$value = $this->app->input->post( $this->get_post_field_name( $key ), $default );
 		}
 
-		if ( isset( $setting['null'] ) && empty( $setting['null'] ) && (string) $value === '' ) {
+		if ( empty( $setting['nullable'] ) && (string) $value === '' ) {
 			$value = null;
 		}
 
