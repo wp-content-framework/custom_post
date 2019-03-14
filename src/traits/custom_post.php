@@ -664,8 +664,8 @@ trait Custom_Post {
 				if ( ! array_key_exists( $k, $d ) ) {
 					continue;
 				}
-				if ( isset( $v['export'] ) && is_callable( $v['export'] ) ) {
-					$data[ $k ] = ( $v['export'] )( $d[ $k ] );
+				if ( isset( $v['export'] ) && $this->is_closure( $v['export'] ) ) {
+					$data[ $k ] = $this->call_closure( $v['export'], $d[ $k ] );
 				} else {
 					$data[ $k ] = $d[ $k ];
 				}
@@ -885,16 +885,16 @@ trait Custom_Post {
 				$escape = true;
 
 				if ( is_array( $v ) ) {
-					if ( isset( $v['callback'] ) && is_callable( $v['callback'] ) ) {
-						$value = ( $v['callback'] )( $value, $data, $post );
+					if ( isset( $v['callback'] ) && $this->is_closure( $v['callback'] ) ) {
+						$value = call_user_func( $v['callback'], $value, $data, $post );
 					} elseif ( isset( $v['value'] ) ) {
 						$value .= $v['value'];
 					}
 					if ( isset( $v['unescape'] ) ) {
 						$escape = false;
 					}
-				} elseif ( is_callable( $v ) ) {
-					$value = $v( $value, $data, $post );
+				} elseif ( $this->is_closure( $v ) ) {
+					$value = $this->call_closure( $v, $value, $data, $post );
 				} else {
 					$value .= $v;
 				}
