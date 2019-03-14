@@ -450,14 +450,14 @@ trait Custom_Post {
 					continue;
 				}
 				if ( ! empty( $v['default_sort'] ) ) {
-					$_priority                     = $this->app->utility->array_get( $v, 'default_sort_priority', 10 );
-					$_orderby                      = $this->app->utility->array_get( $v, 'orderby', "{$table}.{$k}" );
-					$_order                        = $this->app->utility->array_get( $v, 'desc', false ) ? 'DESC' : 'ASC';
+					$_priority                     = $this->app->array->get( $v, 'default_sort_priority', 10 );
+					$_orderby                      = $this->app->array->get( $v, 'orderby', "{$table}.{$k}" );
+					$_order                        = $this->app->array->get( $v, 'desc', false ) ? 'DESC' : 'ASC';
 					$_orderby_list[ $_priority ][] = "{$_orderby} {$_order}";
 				}
 			}
 			ksort( $_orderby_list );
-			$_orderby_list   = $this->app->utility->flatten( $_orderby_list );
+			$_orderby_list   = $this->app->array->flatten( $_orderby_list );
 			$_orderby_list[] = "{$table}.updated_at DESC";
 
 			$func = function (
@@ -488,7 +488,7 @@ trait Custom_Post {
 						/** @var string $orderby */
 						/** @var \WP_Query $wp_query */
 						remove_filter( 'posts_orderby', $func );
-						$_orderby = $this->app->utility->array_get( $v, 'orderby', "{$table}.{$k}" );
+						$_orderby = $this->app->array->get( $v, 'orderby', "{$table}.{$k}" );
 
 						return "{$_orderby} {$_order}, {$orderby}";
 					};
@@ -698,7 +698,7 @@ trait Custom_Post {
 	 * @return string
 	 */
 	private function get_export_filename() {
-		return $this->app->utility->replace_time( $this->apply_filters( 'export_filename', 'export${Y}${m}${d}${H}${i}${s}' ) ) . '.json';
+		return $this->app->string->replace_time( $this->apply_filters( 'export_filename', 'export${Y}${m}${d}${H}${i}${s}' ) ) . '.json';
 	}
 
 	/**
@@ -919,7 +919,7 @@ trait Custom_Post {
 		}
 
 		foreach ( $this->get_data_field_settings() as $k => $v ) {
-			$data[ $k ] = $this->sanitize_input( $this->app->utility->array_get( $data, $k ), $v['type'] );
+			$data[ $k ] = $this->sanitize_input( $this->app->array->get( $data, $k ), $v['type'] );
 		}
 
 		return $data;
@@ -1184,7 +1184,7 @@ trait Custom_Post {
 	 * @return mixed
 	 */
 	protected function get_validation_var( $key, array $post_array ) {
-		return $this->app->utility->array_get( $post_array, $this->get_post_field_name( $key ) );
+		return $this->app->array->get( $post_array, $this->get_post_field_name( $key ) );
 	}
 
 	/**
@@ -1198,7 +1198,7 @@ trait Custom_Post {
 	 */
 	protected function get_post_field( $key, $default = null, $post_array = null, array $setting = [], $filter = true ) {
 		if ( isset( $post_array ) ) {
-			$value = $this->app->utility->array_get( $post_array, $this->get_post_field_name( $key ), $default );
+			$value = $this->app->array->get( $post_array, $this->get_post_field_name( $key ), $default );
 		} else {
 			$value = $this->app->input->post( $this->get_post_field_name( $key ), $default );
 		}
@@ -1235,7 +1235,7 @@ trait Custom_Post {
 	public function get_data_field_settings() {
 		$columns = $this->app->db->get_columns( $this->get_related_table_name() );
 		unset( $columns['id'] );
-		$columns = $this->app->utility->array_combine( $columns, 'name' );
+		$columns = $this->app->array->combine( $columns, 'name' );
 		unset( $columns['post_id'] );
 		unset( $columns['created_at'] );
 		unset( $columns['created_by'] );
@@ -1279,7 +1279,7 @@ trait Custom_Post {
 		$this->add_script_view( 'admin/script/custom_post', $params );
 		$this->add_script_view( 'admin/script/custom_post/' . $this->get_post_type_slug(), $params );
 		if ( ! $this->get_view( 'admin/custom_post/' . $this->get_post_type_slug(), $params, true, false ) ) {
-			$columns = $this->app->utility->array_pluck( $params['columns'], 'is_user_defined' );
+			$columns = $this->app->array->pluck( $params['columns'], 'is_user_defined' );
 			unset( $columns['post_id'] );
 			if ( ! empty( array_filter( $columns ) ) ) {
 				$this->get_view( 'admin/custom_post', $params, true, false );
@@ -1329,7 +1329,7 @@ trait Custom_Post {
 	 * @return array
 	 */
 	private function get_table_columns() {
-		return $this->app->utility->array_map( $this->app->db->get_columns( $this->get_related_table_name() ), function ( $d ) {
+		return $this->app->array->map( $this->app->db->get_columns( $this->get_related_table_name() ), function ( $d ) {
 			$d['form_type'] = $this->get_form_by_type( $d['type'] );
 			$d['required']  = ! isset( $d['default'] ) && isset( $d['null'] ) && empty( $d['null'] );
 
@@ -1444,7 +1444,7 @@ trait Custom_Post {
 	) {
 		$columns = $this->app->db->get_columns( $this->get_related_table_name() );
 		unset( $columns['id'] );
-		$columns = $this->app->utility->array_combine( $columns, 'name' );
+		$columns = $this->app->array->combine( $columns, 'name' );
 
 		return array_map( function ( $d ) use ( $key, $columns ) {
 			$key = $this->table_column_to_name( $key, $columns );
