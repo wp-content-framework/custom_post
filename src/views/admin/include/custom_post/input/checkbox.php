@@ -17,13 +17,13 @@ if ( ! defined( 'WP_CONTENT_FRAMEWORK' ) ) {
 /** @var array $column */
 /** @var string $name */
 /** @var string $prefix */
-$default = ! empty( $instance->app->utility->array_get( $column, 'default' ) );
+$default = ! empty( $instance->app->array->get( $column, 'default' ) );
 $val     = $instance->old( $prefix . $name, $data, $name, $default, true ) - 0;
 ?>
 <?php $instance->form( 'input/checkbox', [
 	'name'    => $prefix . $name,
 	'id'      => $prefix . $name,
 	'value'   => 1,
-	'label'   => $instance->app->utility->array_search( $column, 'label', 'comment', 'name', '' ),
+	'label'   => $instance->app->array->search( $column, 'label', 'comment', 'name', '' ),
 	'checked' => ! empty( $val ),
-], $instance->app->utility->array_get( $column, 'args', [] ) ); ?>
+], $instance->app->array->get( $column, 'args', [] ) ); ?>

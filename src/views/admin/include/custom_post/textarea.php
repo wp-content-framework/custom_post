@@ -17,12 +17,12 @@ if ( ! defined( 'WP_CONTENT_FRAMEWORK' ) ) {
 /** @var array $column */
 /** @var string $name */
 /** @var string $prefix */
-$attr         = $instance->app->utility->array_get( $column, 'attributes', [] );
-$attr['rows'] = $instance->app->utility->array_get( $column, 'rows', 5 );
+$attr         = $instance->app->array->get( $column, 'attributes', [] );
+$attr['rows'] = $instance->app->array->get( $column, 'rows', 5 );
 ?>
 <?php $instance->form( 'textarea', [
 	'name'       => $prefix . $name,
 	'id'         => $prefix . $name,
-	'value'      => $instance->old( $prefix . $name, $data, $name, $instance->app->utility->array_get( $column, 'default', '' ) ),
+	'value'      => $instance->old( $prefix . $name, $data, $name, $instance->app->array->get( $column, 'default', '' ) ),
 	'attributes' => $attr,
-], $instance->app->utility->array_get( $column, 'args', [] ) ); ?>
+], $instance->app->array->get( $column, 'args', [] ) ); ?>
