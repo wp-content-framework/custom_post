@@ -370,8 +370,6 @@ trait Custom_Post {
 			return $search;
 		}
 
-		global $wpdb;
-
 		$exclusion_prefix = apply_filters( 'wp_query_search_exclusion_prefix', '-' );
 		$search           = '';
 		$q                = $wp_query->query_vars;
@@ -393,12 +391,12 @@ trait Custom_Post {
 			$fields     = array_map( function ( $field ) use ( $table ) {
 				return "{$table}.{$field}";
 			}, $fields );
-			$fields[]   = "{$wpdb->posts}.post_title";
-			$fields[]   = "{$wpdb->posts}.post_excerpt";
-			$fields[]   = "{$wpdb->posts}.post_content";
-			$like       = $n . $wpdb->esc_like( $term ) . $n;
+			$fields[]   = "{$this->get_wp_table('posts')}.post_title";
+			$fields[]   = "{$this->get_wp_table('posts')}.post_excerpt";
+			$fields[]   = "{$this->get_wp_table('posts')}.post_content";
+			$like       = $n . $this->wpdb()->esc_like( $term ) . $n;
 			foreach ( $fields as $field ) {
-				$conditions[] = $wpdb->prepare( "({$field} $like_op %s)", $like );
+				$conditions[] = $this->wpdb()->prepare( "({$field} $like_op %s)", $like );
 			}
 			$conditions = implode( " {$andor_op} ", $conditions );
 			$search     .= " AND ({$conditions})";
@@ -424,10 +422,8 @@ trait Custom_Post {
 		/** @noinspection PhpUnusedParameterInspection */
 		$join, $wp_query
 	) {
-		/** @var \wpdb $wpdb */
-		global $wpdb;
 		$table = $this->app->db->get_table( $this->get_related_table_name() );
-		$join  .= " INNER JOIN {$table} ON {$table}.post_id = {$wpdb->posts}.ID ";
+		$join  .= " INNER JOIN {$table} ON {$table}.post_id = {$this->get_wp_table('posts')}.ID ";
 
 		return $join;
 	}
