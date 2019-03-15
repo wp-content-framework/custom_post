@@ -69,18 +69,22 @@ trait Custom_Post {
 
 			return;
 		}
-		add_filter( "views_edit-{$post_type}", function ( $views ) {
-			return $this->view_edit( $views );
-		} );
-		add_filter( "bulk_actions-edit-{$post_type}", function ( $actions ) {
-			return $this->bulk_actions( $actions );
-		} );
-		add_filter( "handle_bulk_actions-edit-{$post_type}", function ( $sendback, $doaction, $post_ids ) {
-			return $this->handle_bulk_actions( $sendback, $doaction, (array) $post_ids );
-		}, 10, 3 );
-		add_filter( "manage_edit-{$post_type}_sortable_columns", function ( $sortable_columns ) {
-			return $this->manage_posts_columns( $sortable_columns, true );
-		} );
+
+		global $typenow;
+		if ( $post_type === $typenow ) {
+			add_filter( "views_edit-{$post_type}", function ( $views ) {
+				return $this->view_edit( $views );
+			} );
+			add_filter( "bulk_actions-edit-{$post_type}", function ( $actions ) {
+				return $this->bulk_actions( $actions );
+			} );
+			add_filter( "handle_bulk_actions-edit-{$post_type}", function ( $sendback, $doaction, $post_ids ) {
+				return $this->handle_bulk_actions( $sendback, $doaction, (array) $post_ids );
+			}, 10, 3 );
+			add_filter( "manage_edit-{$post_type}_sortable_columns", function ( $sortable_columns ) {
+				return $this->manage_posts_columns( $sortable_columns, true );
+			} );
+		}
 	}
 
 	/**
