@@ -2,7 +2,7 @@
 /**
  * WP_Framework_Custom_Post Classes Models Custom Post
  *
- * @version 0.0.26
+ * @version 0.0.27
  * @author Technote
  * @copyright Technote All Rights Reserved
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU General Public License, version 2
@@ -196,13 +196,12 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 			return $cached;
 		}
 
-		global $wpdb;
 		/** @noinspection SqlResolve */
-		$query = "SELECT post_status, COUNT( * ) AS num_posts FROM {$wpdb->posts} ";
+		$query = "SELECT post_status, COUNT( * ) AS num_posts FROM {$this->get_wp_table('posts')} ";
 		$query .= $this->posts_join( '', $type );
 		$query .= ' WHERE post_type = %s GROUP BY post_status';
 
-		$results = (array) $wpdb->get_results( $wpdb->prepare( $query, $type ), ARRAY_A );
+		$results = (array) $this->wpdb()->get_results( $this->wpdb()->prepare( $query, $type ), ARRAY_A );
 		$counts  = array_fill_keys( get_post_stati(), 0 );
 		foreach ( $results as $row ) {
 			$counts[ $row['post_status'] ] = $row['num_posts'];
