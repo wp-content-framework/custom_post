@@ -2,7 +2,7 @@
 /**
  * WP_Framework_Custom_Post Deprecated Traits Custom Post
  *
- * @version 0.0.26
+ * @version 0.0.28
  * @author Technote
  * @copyright Technote All Rights Reserved
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU General Public License, version 2
@@ -34,15 +34,13 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Singleton {
 	 * @return array
 	 */
 	public function list_data( $instance, $is_valid = true, $per_page = null, $page = 1, $where = null, $orderby = null ) {
-		/** @var \wpdb $wpdb */
-		global $wpdb;
 		$table = $instance->get_related_table_name();
 		$limit = $per_page;
 		$page  = max( 1, $page );
 		$table = [
 			[ $table, 't' ],
 			[
-				[ $wpdb->posts, 'p' ],
+				[ $this->get_wp_table( 'posts' ), 'p' ],
 				'INNER JOIN',
 				[
 					't.post_id',
