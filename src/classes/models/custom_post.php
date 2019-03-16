@@ -600,7 +600,7 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 	 * @return bool
 	 */
 	private function is_valid_update( $post_status, $post_type, $untrash = false ) {
-		return ! $this->app->utility->defined( 'DOING_AUTOSAVE' ) && in_array( $post_status, [
+		return ! $this->app->utility->is_autosave() && in_array( $post_status, [
 				'publish',
 				'future',
 				'draft',
