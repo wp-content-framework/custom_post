@@ -986,6 +986,10 @@ trait Custom_Post {
 		if ( $is_valid ) {
 			$query->where( 'p.post_status', 'publish' );
 		}
+		$exclude = get_post_stati( [ 'exclude_from_search' => true ] );
+		if ( ! empty( $exclude ) ) {
+			$query->where_not_in( 'p.post_status', $exclude );
+		}
 		$this->call_if_closure( $callback, $query );
 		$total      = $query->count();
 		$per_page   = isset( $per_page ) && $per_page > 0 ? (int) $per_page : 0;
