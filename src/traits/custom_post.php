@@ -70,8 +70,7 @@ trait Custom_Post {
 			return;
 		}
 
-		global $typenow;
-		if ( $post_type === $typenow ) {
+		if ( isset( $_REQUEST['post_type'] ) && $_REQUEST['post_type'] === $post_type ) {
 			add_filter( "views_edit-{$post_type}", function ( $views ) {
 				return $this->view_edit( $views );
 			} );
