@@ -143,6 +143,14 @@ class Custom_Post extends \WP_Framework_Custom_Post\Tests\TestCase {
 					'post_status' => 'draft',
 				],
 			],
+			[
+				true,
+				[
+					'post_title'  => 'test6',
+					'test1'       => 'test1-6',
+					'post_status' => 'trash',
+				],
+			],
 		];
 	}
 
