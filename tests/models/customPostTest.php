@@ -2,7 +2,7 @@
 /**
  * WP_Framework_Custom_Post Models Custom Post Test
  *
- * @version 0.0.26
+ * @version 0.0.29
  * @author Technote
  * @copyright Technote All Rights Reserved
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU General Public License, version 2
@@ -135,6 +135,14 @@ class Custom_Post extends \WP_Framework_Custom_Post\Tests\TestCase {
 					'post_title' => '',
 				],
 			],
+			[
+				true,
+				[
+					'post_title'  => 'test5',
+					'test1'       => 'test1-5',
+					'post_status' => 'draft',
+				],
+			],
 		];
 	}
 
@@ -243,7 +251,7 @@ class Custom_Post extends \WP_Framework_Custom_Post\Tests\TestCase {
 	 * @param int|null $per_page
 	 * @param int $page
 	 */
-	public function test_get_list_data( $check, $callback, $is_valid = true, $per_page = null, $page = 1 ) {
+	public function test_get_list_data( $check, $callback, $is_valid, $per_page, $page ) {
 		$data = static::$_test->get_list_data( $callback, $is_valid, $per_page, $page );
 		$check( $data );
 	}
@@ -266,6 +274,26 @@ class Custom_Post extends \WP_Framework_Custom_Post\Tests\TestCase {
 					$this->assertEquals( 1, $data['page'] );
 				},
 				null,
+				true,
+				null,
+				1,
+			],
+			[
+				function ( $data ) {
+					$this->assertNotEmpty( $data );
+					$this->assertArrayHasKey( 'total', $data );
+					$this->assertArrayHasKey( 'total_page', $data );
+					$this->assertArrayHasKey( 'page', $data );
+					$this->assertArrayHasKey( 'data', $data );
+					$this->assertEquals( 4, $data['total'] );
+					$this->assertCount( 4, $data['data'] );
+					$this->assertEquals( 1, $data['total_page'] );
+					$this->assertEquals( 1, $data['page'] );
+				},
+				null,
+				false,
+				null,
+				1,
 			],
 			[
 				function ( $data ) {
@@ -283,6 +311,9 @@ class Custom_Post extends \WP_Framework_Custom_Post\Tests\TestCase {
 					/** @var \WP_Framework_Db\Classes\Models\Query\Builder $query */
 					$query->where( 'id', 1 );
 				},
+				true,
+				null,
+				1,
 			],
 			[
 				function ( $data ) {
@@ -296,6 +327,9 @@ class Custom_Post extends \WP_Framework_Custom_Post\Tests\TestCase {
 					/** @var \WP_Framework_Db\Classes\Models\Query\Builder $query */
 					$query->where( 'id', 4 );
 				},
+				true,
+				null,
+				1,
 			],
 			[
 				function ( $data ) {
@@ -312,6 +346,7 @@ class Custom_Post extends \WP_Framework_Custom_Post\Tests\TestCase {
 				null,
 				true,
 				2,
+				1,
 			],
 			[
 				function ( $data ) {
@@ -344,7 +379,7 @@ class Custom_Post extends \WP_Framework_Custom_Post\Tests\TestCase {
 	 * @param array|null $where
 	 * @param array|null $order_by
 	 */
-	public function test_list_data( $check, $is_valid = true, $per_page = null, $page = 1, $where = null, $order_by = null ) {
+	public function test_list_data( $check, $is_valid, $per_page, $page, $where, $order_by ) {
 		$data = static::$_test->list_data( $is_valid, $per_page, $page, $where, $order_by );
 		$check( $data );
 	}
@@ -366,6 +401,29 @@ class Custom_Post extends \WP_Framework_Custom_Post\Tests\TestCase {
 					$this->assertEquals( 1, $data['total_page'] );
 					$this->assertEquals( 1, $data['page'] );
 				},
+				true,
+				null,
+				1,
+				null,
+				null,
+			],
+			[
+				function ( $data ) {
+					$this->assertNotEmpty( $data );
+					$this->assertArrayHasKey( 'total', $data );
+					$this->assertArrayHasKey( 'total_page', $data );
+					$this->assertArrayHasKey( 'page', $data );
+					$this->assertArrayHasKey( 'data', $data );
+					$this->assertEquals( 4, $data['total'] );
+					$this->assertCount( 4, $data['data'] );
+					$this->assertEquals( 1, $data['total_page'] );
+					$this->assertEquals( 1, $data['page'] );
+				},
+				false,
+				null,
+				1,
+				null,
+				null,
 			],
 			[
 				function ( $data ) {
@@ -382,6 +440,7 @@ class Custom_Post extends \WP_Framework_Custom_Post\Tests\TestCase {
 				null,
 				1,
 				[ 't.test_id' => 1 ],
+				null,
 			],
 			[
 				function ( $data ) {
@@ -397,6 +456,9 @@ class Custom_Post extends \WP_Framework_Custom_Post\Tests\TestCase {
 				},
 				true,
 				2,
+				1,
+				null,
+				null,
 			],
 			[
 				function ( $data ) {
@@ -413,7 +475,81 @@ class Custom_Post extends \WP_Framework_Custom_Post\Tests\TestCase {
 				true,
 				2,
 				5,
+				null,
+				null,
 			],
+		];
+	}
+
+	/**
+	 * @dataProvider _test_count_provider
+	 * @depends      test_update
+	 *
+	 * @param int $expected
+	 * @param bool $only_publish
+	 */
+	public function test_count( $expected, $only_publish ) {
+		$this->assertEquals( $expected, static::$_test->count( $only_publish ) );
+	}
+
+	/**
+	 * @return array
+	 */
+	public function _test_count_provider() {
+		return [
+			[ 4, false ],
+			[ 3, true ],
+		];
+	}
+
+	/**
+	 * @dataProvider _test_is_empty1_provider
+	 * @depends      test_update
+	 *
+	 * @param bool $expected
+	 * @param bool $only_publish
+	 */
+	public function test_is_empty1( $expected, $only_publish ) {
+		$this->assertEquals( $expected, static::$_test->is_empty( $only_publish ) );
+	}
+
+	/**
+	 * @return array
+	 */
+	public function _test_is_empty1_provider() {
+		return [
+			[ false, false ],
+			[ false, true ],
+		];
+	}
+
+	/**
+	 * @depends      test_update
+	 */
+	public function test_delete_data() {
+		foreach ( static::$_test->get_list_data( null, false )['data'] as $data ) {
+			$this->assertInstanceOf( '\WP_Post', wp_delete_post( $data['post_id'] ) );
+		}
+	}
+
+	/**
+	 * @dataProvider _test_is_empty2_provider
+	 * @depends      test_delete_data
+	 *
+	 * @param bool $expected
+	 * @param bool $only_publish
+	 */
+	public function test_is_empty2( $expected, $only_publish ) {
+		$this->assertEquals( $expected, static::$_test->is_empty( $only_publish ) );
+	}
+
+	/**
+	 * @return array
+	 */
+	public function _test_is_empty2_provider() {
+		return [
+			[ true, false ],
+			[ true, true ],
 		];
 	}
 }
