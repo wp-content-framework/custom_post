@@ -88,10 +88,12 @@ trait Custom_Post {
 	}
 
 	/**
+	 * @param string|null $as
+	 *
 	 * @return \WP_Framework_Db\Classes\Models\Query\Builder
 	 */
-	protected function query() {
-		return $this->table( $this->get_related_table_name() );
+	protected function query( $as = null ) {
+		return $this->table( $this->get_related_table_name(), $as );
 	}
 
 	/**
@@ -980,10 +982,8 @@ trait Custom_Post {
 	 * @return array
 	 */
 	public function get_list_data( $callback = null, $is_valid = true, $per_page = null, $page = 1 ) {
-		$table = $this->get_related_table_name();
 		$page  = max( 1, $page );
-
-		$query = $this->table( $table, 't' )->alias_join_wp( 'posts', 'p', 'p.ID', 't.post_id' );
+		$query = $this->query( 't' )->alias_join_wp( 'posts', 'p', 'p.ID', 't.post_id' );
 		if ( $is_valid ) {
 			$query->where( 'p.post_status', 'publish' );
 		}
