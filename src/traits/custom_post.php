@@ -1040,6 +1040,34 @@ trait Custom_Post {
 	}
 
 	/**
+	 * @param bool $only_publish
+	 *
+	 * @return int
+	 */
+	public function count( $only_publish = false ) {
+		$query = $this->query( 't' )->alias_join_wp( 'posts', 'p', 'p.ID', 't.post_id' );
+		if ( $only_publish ) {
+			$query->where( 'p.post_status', 'publish' );
+		}
+
+		return $query->count();
+	}
+
+	/**
+	 * @param bool $only_publish
+	 *
+	 * @return bool
+	 */
+	public function is_empty( $only_publish = false ) {
+		$query = $this->query( 't' )->alias_join_wp( 'posts', 'p', 'p.ID', 't.post_id' );
+		if ( $only_publish ) {
+			$query->where( 'p.post_status', 'publish' );
+		}
+
+		return ! $query->exists();
+	}
+
+	/**
 	 * @param array $d
 	 *
 	 * @return array

@@ -212,6 +212,20 @@ interface Custom_Post extends \WP_Framework_Core\Interfaces\Singleton, \WP_Frame
 	public function pagination( $per_page, $page, $callback = null, $is_valid = true );
 
 	/**
+	 * @param bool $only_publish
+	 *
+	 * @return int
+	 */
+	public function count( $only_publish = false );
+
+	/**
+	 * @param bool $only_publish
+	 *
+	 * @return bool
+	 */
+	public function is_empty( $only_publish = false );
+
+	/**
 	 * @param array $params
 	 * @param array $where
 	 * @param \WP_Post $post
