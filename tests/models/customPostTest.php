@@ -2,7 +2,7 @@
 /**
  * WP_Framework_Custom_Post Models Custom Post Test
  *
- * @version 0.0.29
+ * @version 0.0.31
  * @author Technote
  * @copyright Technote All Rights Reserved
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU General Public License, version 2
@@ -141,6 +141,14 @@ class Custom_Post extends \WP_Framework_Custom_Post\Tests\TestCase {
 					'post_title'  => 'test5',
 					'test1'       => 'test1-5',
 					'post_status' => 'draft',
+				],
+			],
+			[
+				true,
+				[
+					'post_title'  => 'test6',
+					'test1'       => 'test1-6',
+					'post_status' => 'trash',
 				],
 			],
 		];
