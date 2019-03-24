@@ -257,7 +257,7 @@ trait Custom_Post {
 	public function get_post_type_args( $capabilities = null ) {
 		$save = false;
 		if ( ! isset( $capabilities ) ) {
-			$cache = $this->cache_get( 'post_type_args' );
+			$cache = $this->cache_get_common( 'post_type_args' );
 			if ( is_array( $cache ) ) {
 				return $cache;
 			}
@@ -285,7 +285,7 @@ trait Custom_Post {
 		] );
 
 		if ( $save ) {
-			$this->cache_set( 'post_type_args', $args );
+			$this->cache_set_common( 'post_type_args', $args );
 		}
 
 		return $args;
