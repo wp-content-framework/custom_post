@@ -61,6 +61,7 @@ class TestCase extends \PHPUnit\Framework\TestCase {
 		\Phake::when( static::$app )->__get( 'utility' )->thenReturn( \WP_Framework_Common\Classes\Models\Utility::get_instance( static::$app ) );
 		\Phake::when( static::$app )->__get( 'array' )->thenReturn( \WP_Framework_Common\Classes\Models\Array_Utility::get_instance( static::$app ) );
 		\Phake::when( static::$app )->__get( 'string' )->thenReturn( \WP_Framework_Common\Classes\Models\String_Utility::get_instance( static::$app ) );
+		\Phake::when( static::$app )->__get( 'file' )->thenReturn( \WP_Framework_Common\Classes\Models\File_Utility::get_instance( static::$app ) );
 		\Phake::when( static::$app )->__get( 'user' )->thenReturn( \WP_Framework_Common\Classes\Models\User::get_instance( static::$app ) );
 		\Phake::when( static::$app )->__get( 'deprecated' )->thenReturn( \WP_Framework_Common\Classes\Models\Deprecated::get_instance( static::$app ) );
 		\Phake::when( static::$app )->__get( 'option' )->thenReturn( \WP_Framework_Common\Classes\Models\Option::get_instance( static::$app ) );
