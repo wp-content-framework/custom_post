@@ -613,7 +613,7 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 				'draft',
 				'pending',
 				'private',
-			] ) && $this->is_valid_custom_post_type( $post_type ) && ( $untrash || 'untrash' !== $this->app->input->get( 'action' ) );
+			] ) && $this->is_valid_custom_post_type( $post_type ) && ( $untrash === ( 'untrash' === $this->app->input->get( 'action' ) ) );
 	}
 
 	/**
