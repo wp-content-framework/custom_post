@@ -18,18 +18,18 @@ if ( ! defined( 'WP_CONTENT_FRAMEWORK' ) ) {
 ?>
 
 <script>
-	( function ( $ ) {
+	( function( $ ) {
 		const $button = $( '.page-title-action' );
 		if ( $button.length ) {
 			$button.before( '<div class="import-button-wrapper"><input type="file"/><input type="button" value="<?php $instance->h( 'Import from JSON', true );?>" class="import-button button-primary large"/></div>' );
 
-			const $wrapper          = $( '.import-button-wrapper' );
-			let importing           = false;
+			const $wrapper = $( '.import-button-wrapper' );
+			let importing = false;
 			const importing_message = '<?php $instance->h( 'importing', true );?>...';
-			const result_message    = '<div class="result-wrap"><div class="result-message"></div><div><input type="button" class="button-primary large close" value="<?php $instance->h( 'Close', true );?>"/></div></div>';
-			const api_class         = window[ '<?php $instance->h( $api_class );?>' ];
-			const modal_class       = window[ '<?php $instance->modal_class();?>' ];
-			$wrapper.find( 'input[type="file"]' ).on( 'change', function () {
+			const result_message = '<div class="result-wrap"><div class="result-message"></div><div><input type="button" class="button-primary large close" value="<?php $instance->h( 'Close', true );?>"/></div></div>';
+			const api_class = window[ '<?php $instance->h( $api_class );?>' ];
+			const modal_class = window[ '<?php $instance->modal_class();?>' ];
+			$wrapper.find( 'input[type="file"]' ).on( 'change', function() {
 				if ( this.files.length > 0 ) {
 					if ( importing ) {
 						return false;
@@ -39,8 +39,8 @@ if ( ! defined( 'WP_CONTENT_FRAMEWORK' ) ) {
 					const formData = new FormData();
 					formData.append( 'import', this.files[ 0 ] );
 					formData.append( 'post_type', '<?php $instance->h( $post_type );?>' );
-					api_class.ajax( 'import_custom_post', formData ).done( function ( json ) {
-						const close_modal = function () {
+					api_class.ajax( 'import_custom_post', formData ).done( function( json ) {
+						const close_modal = function() {
 							if ( json.success ) {
 								location.reload();
 							} else {
@@ -58,17 +58,17 @@ if ( ! defined( 'WP_CONTENT_FRAMEWORK' ) ) {
 							modal_class._message().find( '.result-message' ).addClass( 'error' );
 						}
 						modal_class._set_message_size();
-					} ).fail( function ( err ) {
+					} ).fail( function( err ) {
 						modal_class.hide();
 						console.log( err );
-					} ).always( function () {
+					} ).always( function() {
 						importing = false;
 					} );
 
 					modal_class.show( true, null, importing_message );
 				}
 			} );
-			$wrapper.find( '.import-button' ).on( 'click', function () {
+			$wrapper.find( '.import-button' ).on( 'click', function() {
 				$wrapper.find( 'input[type="file"]' ).click();
 			} );
 		}
