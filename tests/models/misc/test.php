@@ -11,6 +11,9 @@
 
 namespace WP_Framework_Custom_Post\Tests\Models\Misc;
 
+use WP_Framework_Core\Traits\Helper\Data_Helper;
+use WP_Framework_Core\Traits\Helper\Validate;
+
 if ( ! defined( 'WP_CONTENT_FRAMEWORK' ) ) {
 	exit;
 }
@@ -21,7 +24,7 @@ if ( ! defined( 'WP_CONTENT_FRAMEWORK' ) ) {
  */
 class Test implements \WP_Framework_Custom_Post\Interfaces\Custom_Post {
 
-	use \WP_Framework_Custom_Post\Traits\Custom_Post, \WP_Framework_Core\Traits\Helper\Data_Helper, \WP_Framework_Core\Traits\Helper\Validate;
+	use \WP_Framework_Custom_Post\Traits\Custom_Post, Data_Helper, Validate;
 
 	/**
 	 * @return string

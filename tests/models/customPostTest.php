@@ -11,6 +11,11 @@
 
 namespace WP_Framework_Custom_Post\Tests\Models;
 
+use Closure;
+use Phake;
+use WP_Framework_Custom_Post\Tests\TestCase;
+use WP_Framework_Db\Classes\Models\Query\Builder;
+
 require_once __DIR__ . DS . 'misc' . DS . 'custom_post.php';
 require_once __DIR__ . DS . 'misc' . DS . 'test.php';
 require_once __DIR__ . DS . 'misc' . DS . 'db.php';
@@ -21,7 +26,7 @@ require_once __DIR__ . DS . 'misc' . DS . 'db.php';
  * @group wp_framework
  * @group models
  */
-class Custom_Post extends \WP_Framework_Custom_Post\Tests\TestCase {
+class Custom_Post extends TestCase {
 
 	/**
 	 * @var Misc\Db $_db
@@ -36,7 +41,7 @@ class Custom_Post extends \WP_Framework_Custom_Post\Tests\TestCase {
 	public static function setUpBeforeClass() {
 		parent::setUpBeforeClass();
 		static::$_db = Misc\Db::get_instance( static::$app );
-		\Phake::when( static::$app )->__get( 'db' )->thenReturn( static::$_db );
+		Phake::when( static::$app )->__get( 'db' )->thenReturn( static::$_db );
 		static::$_db->setup( 'test', [
 			'columns' => [
 				'post_id' => [
@@ -189,7 +194,7 @@ class Custom_Post extends \WP_Framework_Custom_Post\Tests\TestCase {
 	 * @dataProvider _test_data_provider
 	 * @depends      test_update
 	 *
-	 * @param \Closure $check
+	 * @param Closure $check
 	 * @param int $id
 	 */
 	public function test_data( $check, $id ) {
@@ -253,8 +258,8 @@ class Custom_Post extends \WP_Framework_Custom_Post\Tests\TestCase {
 	 * @dataProvider _test_get_list_data_provider
 	 * @depends      test_update
 	 *
-	 * @param \Closure $check
-	 * @param \Closure $callback
+	 * @param Closure $check
+	 * @param Closure $callback
 	 * @param bool $is_valid
 	 * @param int|null $per_page
 	 * @param int $page
@@ -316,7 +321,7 @@ class Custom_Post extends \WP_Framework_Custom_Post\Tests\TestCase {
 					$this->assertEquals( 0, $data['data'][0]['test3'] );
 				},
 				function ( $query ) {
-					/** @var \WP_Framework_Db\Classes\Models\Query\Builder $query */
+					/** @var Builder $query */
 					$query->where( 'id', 1 );
 				},
 				true,
@@ -332,7 +337,7 @@ class Custom_Post extends \WP_Framework_Custom_Post\Tests\TestCase {
 					$this->assertEmpty( $data['data'] );
 				},
 				function ( $query ) {
-					/** @var \WP_Framework_Db\Classes\Models\Query\Builder $query */
+					/** @var Builder $query */
 					$query->where( 'id', 4 );
 				},
 				true,
@@ -380,7 +385,7 @@ class Custom_Post extends \WP_Framework_Custom_Post\Tests\TestCase {
 	 * @dataProvider _test_list_data_provider
 	 * @depends      test_update
 	 *
-	 * @param \Closure $check
+	 * @param Closure $check
 	 * @param bool $is_valid
 	 * @param int|null $per_page
 	 * @param int $page

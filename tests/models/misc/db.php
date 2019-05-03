@@ -11,6 +11,8 @@
 
 namespace WP_Framework_Custom_Post\Tests\Models\Misc;
 
+use wpdb;
+
 if ( ! defined( 'WP_CONTENT_FRAMEWORK' ) ) {
 	exit;
 }
@@ -46,7 +48,7 @@ class Db extends \WP_Framework_Db\Classes\Models\Db {
 	 * @param string $table
 	 */
 	public function drop( $table ) {
-		/** @var \wpdb $wpdb */
+		/** @var wpdb $wpdb */
 		global $wpdb;
 
 		$sql = 'DROP TABLE IF EXISTS `' . $this->get_table( $table ) . '`';

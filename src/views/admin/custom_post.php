@@ -9,11 +9,13 @@
  * @link https://technote.space
  */
 
+use WP_Framework_Presenter\Interfaces\Presenter;
+
 if ( ! defined( 'WP_CONTENT_FRAMEWORK' ) ) {
 	return;
 }
-/** @var \WP_Framework_Presenter\Interfaces\Presenter $instance */
-/** @var \WP_Post $post */
+/** @var Presenter $instance */
+/** @var WP_Post $post */
 /** @var array $data */
 /** @var array $columns */
 /** @var string $prefix */
