@@ -745,7 +745,7 @@ trait Custom_Post {
 			$validation = $this->validate_insert( $item );
 			if ( empty( $validation ) ) {
 				$this->insert( $item );
-				$success ++;
+				$success++;
 			} else {
 				$failed[] = [ $item, $validation ];
 			}
