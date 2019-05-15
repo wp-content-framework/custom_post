@@ -936,7 +936,7 @@ trait Custom_Post {
 		}
 
 		foreach ( $this->get_data_field_settings() as $k => $v ) {
-			$data[ $k ] = $this->sanitize_input( $this->app->array->get( $data, $k ), $v['type'] );
+			$data[ $k ] = $this->sanitize_input( $this->app->array->get( $data, $k ), $v['type'], false, $v['nullable'] );
 		}
 
 		return $data;
@@ -1156,8 +1156,8 @@ trait Custom_Post {
 		$params = [];
 		foreach ( $this->get_data_field_settings() as $k => $v ) {
 			$params[ $k ] = $this->get_post_field( $k, $update || ! $v['required'] ? null : $v['default'], null, $v );
-			$params[ $k ] = $this->sanitize_input( $params[ $k ], $v['type'], ! $update && $v['unset_if_null'] );
-			if ( ! isset( $params[ $k ] ) && ! $update && $v['unset_if_null'] ) {
+			$params[ $k ] = $this->sanitize_input( $params[ $k ], $v['type'], ! $update && $v['unset_if_null'], $v['nullable'] );
+			if ( ! isset( $params[ $k ] ) && $v['unset_if_null'] ) {
 				unset( $params[ $k ] );
 				continue;
 			}
@@ -1416,7 +1416,7 @@ trait Custom_Post {
 		$errors = [];
 		foreach ( $this->get_data_field_settings() as $k => $v ) {
 			$param    = $this->get_post_field( $k, null, $post_array, $v );
-			$param    = $this->sanitize_input( $param, $v['type'] );
+			$param    = $this->sanitize_input( $param, $v['type'], $v['unset_if_null'], $v['nullable'] );
 			$validate = $this->validate( $param, $v );
 			if ( $validate instanceof WP_Error ) {
 				$errors[ $k ][] = $validate->get_error_message();
