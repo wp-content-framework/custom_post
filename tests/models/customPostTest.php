@@ -225,7 +225,7 @@ class Custom_Post extends TestCase {
 					'post_title' => 'test1',
 					'test1'      => 'test1-1',
 					'test2'      => 1,
-					'test3'      => 0,
+					'test3'      => 1,
 					'test7'      => 'test7-1',
 					'test11'     => 11,
 					'test15'     => 1,
@@ -408,7 +408,7 @@ class Custom_Post extends TestCase {
 					$this->assertEquals( 11, $data['test11'] );
 
 					$this->assertNull( $data['test12'] );
-					$this->assertEquals( 1, $data['test13'] );
+					$this->assertNull( $data['test13'] );
 					$this->assertNull( $data['test14'] );
 					$this->assertEquals( 1, $data['test15'] );
 				},
@@ -421,7 +421,7 @@ class Custom_Post extends TestCase {
 					$this->assertEquals( 'test3', $data['post_title'] );
 					$this->assertEquals( 'test1', $data['test1'] );
 					$this->assertEquals( 10, $data['test2'] );
-					$this->assertEquals( 1, $data['test3'] );
+					$this->assertEquals( 0, $data['test3'] );
 				},
 				3,
 			],
@@ -728,7 +728,7 @@ class Custom_Post extends TestCase {
 		$params = static::$_test->get_update_data_params( $data['post'], false );
 		$this->assertArrayNotHasKey( 'test1', $params );
 		$this->assertArrayNotHasKey( 'test2', $params );
-		$this->assertArrayNotHasKey( 'test3', $params );
+		$this->assertEquals( 0, $params['test3'] );
 
 		$this->assertNull( $params['test4'] );
 		$this->assertArrayNotHasKey( 'test5', $params );
@@ -741,7 +741,7 @@ class Custom_Post extends TestCase {
 		$this->assertEquals( 11, $params['test11'] );
 
 		$this->assertNull( $params['test12'] );
-		$this->assertArrayNotHasKey( 'test13', $params );
+		$this->assertNull( $params['test13'] );
 		$this->assertNull( $params['test14'] );
 		$this->assertEquals( 0, $params['test15'] );
 
