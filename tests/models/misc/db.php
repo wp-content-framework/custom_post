@@ -2,7 +2,7 @@
 /**
  * WP_Framework_Custom_Post Tests Models Misc Db
  *
- * @version 0.0.26
+ * @version 0.0.34
  * @author Technote
  * @copyright Technote All Rights Reserved
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU General Public License, version 2
@@ -10,6 +10,8 @@
  */
 
 namespace WP_Framework_Custom_Post\Tests\Models\Misc;
+
+use wpdb;
 
 if ( ! defined( 'WP_CONTENT_FRAMEWORK' ) ) {
 	exit;
@@ -46,7 +48,7 @@ class Db extends \WP_Framework_Db\Classes\Models\Db {
 	 * @param string $table
 	 */
 	public function drop( $table ) {
-		/** @var \wpdb $wpdb */
+		/** @var wpdb $wpdb */
 		global $wpdb;
 
 		$sql = 'DROP TABLE IF EXISTS `' . $this->get_table( $table ) . '`';

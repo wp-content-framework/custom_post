@@ -2,7 +2,7 @@
 /**
  * WP_Framework_Custom_Post Tests Models Misc Test
  *
- * @version 0.0.26
+ * @version 0.0.34
  * @author Technote
  * @copyright Technote All Rights Reserved
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU General Public License, version 2
@@ -10,6 +10,9 @@
  */
 
 namespace WP_Framework_Custom_Post\Tests\Models\Misc;
+
+use WP_Framework_Core\Traits\Helper\Data_Helper;
+use WP_Framework_Core\Traits\Helper\Validate;
 
 if ( ! defined( 'WP_CONTENT_FRAMEWORK' ) ) {
 	exit;
@@ -21,7 +24,7 @@ if ( ! defined( 'WP_CONTENT_FRAMEWORK' ) ) {
  */
 class Test implements \WP_Framework_Custom_Post\Interfaces\Custom_Post {
 
-	use \WP_Framework_Custom_Post\Traits\Custom_Post, \WP_Framework_Core\Traits\Helper\Data_Helper, \WP_Framework_Core\Traits\Helper\Validate;
+	use \WP_Framework_Custom_Post\Traits\Custom_Post, Data_Helper, Validate;
 
 	/**
 	 * @return string
