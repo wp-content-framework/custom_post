@@ -1159,19 +1159,19 @@ trait Custom_Post {
 			$params[ $k ] = $this->sanitize_input( $params[ $k ], $v['type'], ! $update && $v['unset_if_null'], $v['nullable'], $update );
 
 			if ( ! isset( $params[ $k ] ) ) {
-				if ( $update ) {
-					if ( '' === $this->app->input->post( $this->get_post_field_name( $k ) ) ) {
-						if ( $v['unset_if_null'] ) {
-							$params[ $k ] = $v['default'];
-						} else {
-							$params[ $k ] = null;
-						}
+				if ( '' === $this->app->input->post( $this->get_post_field_name( $k ) ) ) {
+					if ( $v['unset_if_null'] ) {
+						$params[ $k ] = $v['default'];
 					} else {
-						unset( $params[ $k ] );
+						$params[ $k ] = null;
 					}
 				} else {
-					if ( $v['unset_if_null'] ) {
+					if ( $update ) {
 						unset( $params[ $k ] );
+					} else {
+						if ( $v['unset_if_null'] ) {
+							unset( $params[ $k ] );
+						}
 					}
 				}
 			}
