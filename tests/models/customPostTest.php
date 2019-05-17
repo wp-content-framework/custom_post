@@ -7,6 +7,8 @@
  * @copyright Technote All Rights Reserved
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU General Public License, version 2
  * @link https://technote.space
+ * @see https://github.com/wp-content-framework/custom_post/issues/86
+ * @see https://github.com/wp-content-framework/custom_post/issues/89
  */
 
 namespace WP_Framework_Custom_Post\Tests\Models;
@@ -25,7 +27,6 @@ require_once __DIR__ . DS . 'misc' . DS . 'db.php';
  * @package WP_Framework_Custom_Post\Tests\Models
  * @group wp_framework
  * @group models
- * @see https://github.com/wp-content-framework/custom_post/issues/86
  */
 class Custom_Post extends TestCase {
 
@@ -847,22 +848,22 @@ class Custom_Post extends TestCase {
 		static::$app->input->set_post( static::$_test->get_post_field_name( 'test15' ), '' );
 
 		$params = static::$_test->get_update_data_params( $data['post'], false );
-		$this->assertEquals( $params['test1'], '' );
-		$this->assertArrayNotHasKey( 'test2', $params );
-		$this->assertArrayNotHasKey( 'test3', $params );
+		$this->assertEquals( $params['test1'], 'test1' );
+		$this->assertEquals( $params['test2'], 10 );
+		$this->assertEquals( $params['test3'], 1 );
 
-		$this->assertEquals( $params['test4'], '' );
-		$this->assertEquals( $params['test5'], '' );
-		$this->assertEquals( $params['test6'], '' );
+		$this->assertNull( $params['test4'] );
+		$this->assertEquals( $params['test5'], 'test5' );
+		$this->assertNull( $params['test6'] );
 		$this->assertEquals( $params['test7'], '' );
 
 		$this->assertNull( $params['test8'] );
-		$this->assertArrayNotHasKey( 'test9', $params );
+		$this->assertEquals( $params['test9'], 9 );
 		$this->assertNull( $params['test10'] );
 		$this->assertEquals( 11, $params['test11'] );
 
 		$this->assertNull( $params['test12'] );
-		$this->assertArrayNotHasKey( 'test13', $params );
+		$this->assertEquals( 1, $params['test13'] );
 		$this->assertNull( $params['test14'] );
 		$this->assertEquals( 0, $params['test15'] );
 
