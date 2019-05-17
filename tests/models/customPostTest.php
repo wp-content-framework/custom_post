@@ -25,6 +25,7 @@ require_once __DIR__ . DS . 'misc' . DS . 'db.php';
  * @package WP_Framework_Custom_Post\Tests\Models
  * @group wp_framework
  * @group models
+ * @see https://github.com/wp-content-framework/custom_post/issues/86
  */
 class Custom_Post extends TestCase {
 
