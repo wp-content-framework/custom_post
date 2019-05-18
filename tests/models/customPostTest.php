@@ -2,11 +2,13 @@
 /**
  * WP_Framework_Custom_Post Models Custom Post Test
  *
- * @version 0.0.34
+ * @version 0.0.35
  * @author Technote
  * @copyright Technote All Rights Reserved
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU General Public License, version 2
  * @link https://technote.space
+ * @see https://github.com/wp-content-framework/custom_post/issues/86
+ * @see https://github.com/wp-content-framework/custom_post/issues/89
  */
 
 namespace WP_Framework_Custom_Post\Tests\Models;
@@ -25,7 +27,6 @@ require_once __DIR__ . DS . 'misc' . DS . 'db.php';
  * @package WP_Framework_Custom_Post\Tests\Models
  * @group wp_framework
  * @group models
- * @see https://github.com/wp-content-framework/custom_post/issues/86
  */
 class Custom_Post extends TestCase {
 
@@ -224,7 +225,7 @@ class Custom_Post extends TestCase {
 					'post_title' => 'test1',
 					'test1'      => 'test1-1',
 					'test2'      => 1,
-					'test3'      => 0,
+					'test3'      => 1,
 					'test7'      => 'test7-1',
 					'test11'     => 11,
 					'test15'     => 1,
@@ -407,7 +408,7 @@ class Custom_Post extends TestCase {
 					$this->assertEquals( 11, $data['test11'] );
 
 					$this->assertNull( $data['test12'] );
-					$this->assertEquals( 1, $data['test13'] );
+					$this->assertNull( $data['test13'] );
 					$this->assertNull( $data['test14'] );
 					$this->assertEquals( 1, $data['test15'] );
 				},
@@ -420,7 +421,7 @@ class Custom_Post extends TestCase {
 					$this->assertEquals( 'test3', $data['post_title'] );
 					$this->assertEquals( 'test1', $data['test1'] );
 					$this->assertEquals( 10, $data['test2'] );
-					$this->assertEquals( 1, $data['test3'] );
+					$this->assertEquals( 0, $data['test3'] );
 				},
 				3,
 			],
@@ -727,7 +728,7 @@ class Custom_Post extends TestCase {
 		$params = static::$_test->get_update_data_params( $data['post'], false );
 		$this->assertArrayNotHasKey( 'test1', $params );
 		$this->assertArrayNotHasKey( 'test2', $params );
-		$this->assertArrayNotHasKey( 'test3', $params );
+		$this->assertEquals( 0, $params['test3'] );
 
 		$this->assertNull( $params['test4'] );
 		$this->assertArrayNotHasKey( 'test5', $params );
@@ -740,7 +741,7 @@ class Custom_Post extends TestCase {
 		$this->assertEquals( 11, $params['test11'] );
 
 		$this->assertNull( $params['test12'] );
-		$this->assertArrayNotHasKey( 'test13', $params );
+		$this->assertNull( $params['test13'] );
 		$this->assertNull( $params['test14'] );
 		$this->assertEquals( 0, $params['test15'] );
 
@@ -847,22 +848,22 @@ class Custom_Post extends TestCase {
 		static::$app->input->set_post( static::$_test->get_post_field_name( 'test15' ), '' );
 
 		$params = static::$_test->get_update_data_params( $data['post'], false );
-		$this->assertEquals( $params['test1'], '' );
-		$this->assertArrayNotHasKey( 'test2', $params );
-		$this->assertArrayNotHasKey( 'test3', $params );
+		$this->assertEquals( $params['test1'], 'test1' );
+		$this->assertEquals( $params['test2'], 10 );
+		$this->assertEquals( $params['test3'], 1 );
 
-		$this->assertEquals( $params['test4'], '' );
-		$this->assertEquals( $params['test5'], '' );
-		$this->assertEquals( $params['test6'], '' );
+		$this->assertNull( $params['test4'] );
+		$this->assertEquals( $params['test5'], 'test5' );
+		$this->assertNull( $params['test6'] );
 		$this->assertEquals( $params['test7'], '' );
 
 		$this->assertNull( $params['test8'] );
-		$this->assertArrayNotHasKey( 'test9', $params );
+		$this->assertEquals( $params['test9'], 9 );
 		$this->assertNull( $params['test10'] );
 		$this->assertEquals( 11, $params['test11'] );
 
 		$this->assertNull( $params['test12'] );
-		$this->assertArrayNotHasKey( 'test13', $params );
+		$this->assertEquals( 1, $params['test13'] );
 		$this->assertNull( $params['test14'] );
 		$this->assertEquals( 0, $params['test15'] );
 
