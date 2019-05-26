@@ -360,6 +360,11 @@ interface Custom_Post extends Singleton, Hook, Presenter, Data_Helper, Validate 
 	public function get_edit_post_link( $post_id );
 
 	/**
+	 * @return array
+	 */
+	public function get_exclude_from_search_post_status();
+
+	/**
 	 * @return int
 	 */
 	public function get_load_priority();
