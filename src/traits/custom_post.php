@@ -516,7 +516,16 @@ trait Custom_Post {
 	 * @return bool
 	 */
 	public function is_support_io() {
-		return $this->compare_wp_version( '4.7', '>=' ) && ! empty( $this->app->get_config( 'io', $this->get_post_type_slug() ) ) && $this->user_can( 'edit_others_posts' );
+		return $this->compare_wp_version( '4.7', '>=' ) && ! empty( $this->app->get_config( 'io', $this->get_post_type_slug() ) ) && $this->user_can( 'edit_others_posts' ) && $this->is_valid_export_post_status();
+	}
+
+	/**
+	 * @return bool
+	 */
+	private function is_valid_export_post_status() {
+		$post_status = ! empty( $_REQUEST['post_status'] ) ? $_REQUEST['post_status'] : 'all';
+
+		return ! in_array( $post_status, $this->get_exclude_from_search_post_status() );
 	}
 
 	/**
@@ -1001,7 +1010,7 @@ trait Custom_Post {
 		if ( $is_valid ) {
 			$query->where( 'p.post_status', 'publish' );
 		}
-		$exclude = get_post_stati( [ 'exclude_from_search' => true ] );
+		$exclude = $this->get_exclude_from_search_post_status();
 		if ( ! empty( $exclude ) ) {
 			$query->where_not_in( 'p.post_status', $exclude );
 		}
@@ -1586,6 +1595,13 @@ trait Custom_Post {
 		$action = '&action=edit';
 
 		return admin_url( sprintf( $post_type_object->_edit_link . $action, $post->ID ) );
+	}
+
+	/**
+	 * @return array
+	 */
+	public function get_exclude_from_search_post_status() {
+		return get_post_stati( [ 'exclude_from_search' => true ] );
 	}
 
 	/**
