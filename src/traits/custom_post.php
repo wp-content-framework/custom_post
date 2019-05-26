@@ -652,10 +652,10 @@ trait Custom_Post {
 		$export_data = [];
 		$setting     = $this->app->get_config( 'io', $this->get_post_type_slug() );
 		foreach (
-			$this->get_list_data( function ( $query ) use ( $post_ids ) {
+			$this->app->array->get( $this->get_list_data( function ( $query ) use ( $post_ids ) {
 				/** @var Builder $query */
 				$query->where_in( 'p.ID', $post_ids );
-			} )['data'] as $d
+			}, false ), 'data' ) as $d
 		) {
 			$data = [];
 			if ( in_array( 'title', $this->get_post_type_supports() ) ) {
