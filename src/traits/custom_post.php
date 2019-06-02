@@ -1284,7 +1284,7 @@ trait Custom_Post {
 		} else {
 			$value = $this->app->input->post( $this->get_post_field_name( $key ), $default );
 		}
-		if ( ! $update && 'bool' === $setting['type'] && (string) $value === '' ) {
+		if ( ! $update && 'bool' === $this->app->array->get( $setting, 'type' ) && (string) $value === '' ) {
 			$value = null;
 		}
 
