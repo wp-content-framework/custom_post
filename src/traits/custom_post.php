@@ -82,7 +82,7 @@ trait Custom_Post {
 			return;
 		}
 
-		if ( isset( $_REQUEST['post_type'] ) && $_REQUEST['post_type'] === $post_type ) {
+		if ( $this->app->input->request( 'post_type' ) === $post_type ) {
 			add_filter( "views_edit-{$post_type}", function ( $views ) {
 				return $this->view_edit( $views );
 			} );
@@ -523,9 +523,7 @@ trait Custom_Post {
 	 * @return bool
 	 */
 	private function is_valid_export_post_status() {
-		$post_status = ! empty( $_REQUEST['post_status'] ) ? $_REQUEST['post_status'] : 'all';
-
-		return ! in_array( $post_status, $this->get_exclude_from_search_post_status() );
+		return ! in_array( $this->app->input->request( 'post_status', 'all' ), $this->get_exclude_from_search_post_status() );
 	}
 
 	/**
