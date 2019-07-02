@@ -23,14 +23,16 @@ if ( ! defined( 'WP_CONTENT_FRAMEWORK' ) ) {
 	<dl>
 		<?php foreach ( $columns as $name => $column ): ?>
 			<?php if ( empty( $column['is_user_defined'] ) || 'post_id' === $instance->app->array->get( $column, 'name' ) ): continue; endif; ?>
+			<?php $id = $prefix . $name; ?>
 			<dt>
-                <label for="<?php $instance->h( $prefix . $name ); ?>">
+				<label for="<?php $instance->h( $id ); ?>">
 					<?php $instance->h( $instance->app->array->search( $column, 'comment', 'name', '' ) ); ?>
 					<?php if ( ! empty( $column['required'] ) ): ?><span class="required">*</span><?php endif; ?>
 				</label>
 			</dt>
 			<dd>
 				<?php $instance->get_view( 'admin/include/custom_post/' . $column['form_type'], [
+					'id'     => $id,
 					'data'   => $data,
 					'column' => $column,
 					'name'   => $name,
