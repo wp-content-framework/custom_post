@@ -51,7 +51,9 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Singleton {
 				],
 			],
 		];
-		empty( $where ) and $where = [];
+		if ( empty( $where ) ) {
+			$where = [];
+		}
 		if ( $is_valid ) {
 			$where['p.post_status'] = 'publish';
 		}
@@ -82,8 +84,8 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Singleton {
 			'total'      => $total,
 			'total_page' => $total_page,
 			'page'       => $page,
-			'data'       => array_map( function ( $d ) use ( $posts, $instance ) {
-				return $instance->filter_callback( 'filter_item', [ $instance->filter_callback( 'set_post_data', [ $d, $posts[ $d['post_id'] ] ] ) ] );
+			'data'       => array_map( function ( $data ) use ( $posts, $instance ) {
+				return $instance->filter_callback( 'filter_item', [ $instance->filter_callback( 'set_post_data', [ $data, $posts[ $data['post_id'] ] ] ) ] );
 			}, $list ),
 		];
 	}

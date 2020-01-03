@@ -30,20 +30,20 @@ require_once __DIR__ . DS . 'misc' . DS . 'db.php';
 class Custom_Post extends TestCase {
 
 	/**
-	 * @var Misc\Db $_db
+	 * @var Misc\Db $db
 	 */
-	private static $_db;
+	private static $db;
 
 	/**
-	 * @var Misc\Test $_test
+	 * @var Misc\Test $test
 	 */
-	private static $_test;
+	private static $test;
 
 	public static function setUpBeforeClass() {
 		parent::setUpBeforeClass();
-		static::$_db = Misc\Db::get_instance( static::$app );
-		Phake::when( static::$app )->__get( 'db' )->thenReturn( static::$_db );
-		static::$_db->setup( 'test', [
+		static::$db = Misc\Db::get_instance( static::$app );
+		Phake::when( static::$app )->__get( 'db' )->thenReturn( static::$db );
+		static::$db->setup( 'test', [
 			'columns' => [
 				'post_id' => [
 					'type'     => 'BIGINT(20)',
@@ -67,61 +67,58 @@ class Custom_Post extends TestCase {
 					'null'     => false,
 					'default'  => 1,
 				],
-
-				'test4' => [ // nullable, has default, prior_default = false
+				'test4'   => [ // nullable, has default, prior_default = false
 					'type'    => 'VARCHAR(32)',
 					'default' => 'test4',
 				],
-				'test5' => [ // nullable, has default, prior_default = true
+				'test5'   => [ // nullable, has default, prior_default = true
 					'type'          => 'VARCHAR(32)',
 					'default'       => 'test5',
 					'prior_default' => true,
 				],
-				'test6' => [ // nullable, has not default
+				'test6'   => [ // nullable, has not default
 					'type' => 'VARCHAR(32)',
 				],
-				'test7' => [ // not nullable, has not default
+				'test7'   => [ // not nullable, has not default
 					'type' => 'VARCHAR(32)',
 					'null' => false,
 				],
-
-				'test8'  => [ // nullable, has default, prior_default = false
+				'test8'   => [ // nullable, has default, prior_default = false
 					'type'     => 'INT(11)',
 					'unsigned' => true,
 					'default'  => 8,
 				],
-				'test9'  => [ // nullable, has default, prior_default = true
+				'test9'   => [ // nullable, has default, prior_default = true
 					'type'          => 'INT(11)',
 					'unsigned'      => true,
 					'default'       => 9,
 					'prior_default' => true,
 				],
-				'test10' => [ // nullable, has not default
+				'test10'  => [ // nullable, has not default
 					'type'     => 'INT(11)',
 					'unsigned' => true,
 				],
-				'test11' => [ // not nullable, has not default
+				'test11'  => [ // not nullable, has not default
 					'type'     => 'INT(11)',
 					'unsigned' => true,
 					'null'     => false,
 				],
-
-				'test12' => [ // nullable, has default, prior_default = false
+				'test12'  => [ // nullable, has default, prior_default = false
 					'type'     => 'BIT(1)',
 					'unsigned' => true,
 					'default'  => 1,
 				],
-				'test13' => [ // nullable, has default, prior_default = true
+				'test13'  => [ // nullable, has default, prior_default = true
 					'type'          => 'BIT(1)',
 					'unsigned'      => true,
 					'default'       => 1,
 					'prior_default' => true,
 				],
-				'test14' => [ // nullable, has not default
+				'test14'  => [ // nullable, has not default
 					'type'     => 'BIT(1)',
 					'unsigned' => true,
 				],
-				'test15' => [ // not nullable, has not default
+				'test15'  => [ // not nullable, has not default
 					'type'     => 'BIT(1)',
 					'unsigned' => true,
 					'null'     => false,
@@ -133,43 +130,46 @@ class Custom_Post extends TestCase {
 				],
 			],
 		] );
-		static::$_db->_table_update( 'test' );
-		static::$_test = Misc\Test::get_instance( static::$app );
+		static::$db->wrap_table_update( 'test' );
+		static::$test = Misc\Test::get_instance( static::$app );
 		Misc\Custom_Post::get_instance( static::$app );
 	}
 
 	public static function tearDownAfterClass() {
 		parent::tearDownAfterClass();
-		static::$_test->uninstall();
-		static::$_db->drop( 'test' );
+		static::$test->uninstall();
+		static::$db->drop( 'test' );
 	}
 
 	/**
-	 * @dataProvider _test_insert_provider
+	 * @dataProvider provider_test_insert
 	 *
 	 * @param bool $expected
 	 * @param array $data
 	 */
 	public function test_validate_insert( $expected, $data ) {
-		$this->assertEquals( $expected, empty( static::$_test->validate_insert( $data ) ) );
+		$this->assertEquals( $expected, empty( static::$test->validate_insert( $data ) ) );
 	}
 
 	/**
-	 * @dataProvider _test_insert_provider
+	 * @dataProvider provider_test_insert
 	 *
 	 * @param bool $expected
 	 * @param array $data
 	 */
 	public function test_insert( $expected, $data ) {
-		$result = static::$_test->insert( $data );
-		! empty( $data['post_status'] ) && $data['post_status'] === 'trash' and $expected = true;
+		$result = static::$test->insert( $data );
+		if ( ! empty( $data['post_status'] ) && 'trash' === $data['post_status'] ) {
+			$expected = true;
+		}
 		$this->assertEquals( $expected, is_int( $result ) && $result > 0 );
 	}
 
 	/**
 	 * @return array
+	 * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
 	 */
-	public function _test_insert_provider() {
+	public function provider_test_insert() {
 		return [
 			[
 				false,
@@ -299,7 +299,7 @@ class Custom_Post extends TestCase {
 	}
 
 	/**
-	 * @dataProvider _test_update_provider
+	 * @dataProvider provider_test_update
 	 * @depends      test_insert
 	 *
 	 * @param mixed $expected
@@ -307,14 +307,14 @@ class Custom_Post extends TestCase {
 	 * @param array $where
 	 */
 	public function test_update( $expected, $data, $where ) {
-		$result = static::$_test->update( $data, $where );
+		$result = static::$test->update( $data, $where );
 		$this->assertEquals( $expected, is_int( $result ) && $result > 0 );
 	}
 
 	/**
 	 * @return array
 	 */
-	public function _test_update_provider() {
+	public function provider_test_update() {
 		return [
 			[
 				false,
@@ -353,17 +353,17 @@ class Custom_Post extends TestCase {
 	}
 
 	/**
-	 * @dataProvider _test_data_provider
+	 * @dataProvider provider_test_data
 	 * @depends      test_update
 	 *
 	 * @param Closure $check
 	 * @param int $id
 	 */
 	public function test_data( $check, $id ) {
-		$data    = static::$_test->get_data( $id );
+		$data    = static::$test->get_data( $id );
 		$related = false;
 		if ( false !== $data ) {
-			$related = static::$_test->get_related_data( $data['post_id'] );
+			$related = static::$test->get_related_data( $data['post_id'] );
 		}
 		$check( $data, $related, $id );
 	}
@@ -371,7 +371,7 @@ class Custom_Post extends TestCase {
 	/**
 	 * @return array
 	 */
-	public function _test_data_provider() {
+	public function provider_test_data() {
 		return [
 			[
 				function ( $data, $related ) {
@@ -435,7 +435,7 @@ class Custom_Post extends TestCase {
 	}
 
 	/**
-	 * @dataProvider _test_get_list_data_provider
+	 * @dataProvider provider_test_get_list_data
 	 * @depends      test_update
 	 *
 	 * @param Closure $check
@@ -445,14 +445,15 @@ class Custom_Post extends TestCase {
 	 * @param int $page
 	 */
 	public function test_get_list_data( $check, $callback, $is_valid, $per_page, $page ) {
-		$data = static::$_test->get_list_data( $callback, $is_valid, $per_page, $page );
+		$data = static::$test->get_list_data( $callback, $is_valid, $per_page, $page );
 		$check( $data );
 	}
 
 	/**
 	 * @return array
+	 * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
 	 */
-	public function _test_get_list_data_provider() {
+	public function provider_test_get_list_data() {
 		return [
 			[
 				function ( $data ) {
@@ -562,7 +563,7 @@ class Custom_Post extends TestCase {
 	}
 
 	/**
-	 * @dataProvider _test_list_data_provider
+	 * @dataProvider provider_test_list_data
 	 * @depends      test_update
 	 *
 	 * @param Closure $check
@@ -573,14 +574,14 @@ class Custom_Post extends TestCase {
 	 * @param array|null $order_by
 	 */
 	public function test_list_data( $check, $is_valid, $per_page, $page, $where, $order_by ) {
-		$data = static::$_test->list_data( $is_valid, $per_page, $page, $where, $order_by );
+		$data = static::$test->list_data( $is_valid, $per_page, $page, $where, $order_by );
 		$check( $data );
 	}
 
 	/**
 	 * @return array
 	 */
-	public function _test_list_data_provider() {
+	public function provider_test_list_data() {
 		return [
 			[
 				function ( $data ) {
@@ -675,20 +676,20 @@ class Custom_Post extends TestCase {
 	}
 
 	/**
-	 * @dataProvider _test_count_provider
+	 * @dataProvider provider_test_count
 	 * @depends      test_update
 	 *
 	 * @param int $expected
 	 * @param bool $only_publish
 	 */
 	public function test_count( $expected, $only_publish ) {
-		$this->assertEquals( $expected, static::$_test->count( $only_publish ) );
+		$this->assertEquals( $expected, static::$test->count( $only_publish ) );
 	}
 
 	/**
 	 * @return array
 	 */
-	public function _test_count_provider() {
+	public function provider_test_count() {
 		return [
 			[ 4, false ],
 			[ 3, true ],
@@ -696,20 +697,20 @@ class Custom_Post extends TestCase {
 	}
 
 	/**
-	 * @dataProvider _test_is_empty1_provider
+	 * @dataProvider provider_test_is_empty1
 	 * @depends      test_update
 	 *
 	 * @param bool $expected
 	 * @param bool $only_publish
 	 */
 	public function test_is_empty1( $expected, $only_publish ) {
-		$this->assertEquals( $expected, static::$_test->is_empty( $only_publish ) );
+		$this->assertEquals( $expected, static::$test->is_empty( $only_publish ) );
 	}
 
 	/**
 	 * @return array
 	 */
-	public function _test_is_empty1_provider() {
+	public function provider_test_is_empty1() {
 		return [
 			[ false, false ],
 			[ false, true ],
@@ -717,14 +718,14 @@ class Custom_Post extends TestCase {
 	}
 
 	public function test_get_update_data_params1() {
-		foreach ( static::$app->input->post() as $k => $v ) {
-			static::$app->input->delete_post( $k );
+		foreach ( array_keys( static::$app->input->post() ) as $key ) {
+			static::$app->input->delete_post( $key );
 		}
-		$data = static::$_test->get_list_data()['data'][0];
+		$data = static::$app->array->get( static::$test->get_list_data(), 'data.0' );
 
-		static::$app->input->set_post( static::$_test->get_post_field_name( 'test7' ), 'test7' );
-		static::$app->input->set_post( static::$_test->get_post_field_name( 'test11' ), '11' );
-		$params = static::$_test->get_update_data_params( $data['post'], false );
+		static::$app->input->set_post( static::$test->get_post_field_name( 'test7' ), 'test7' );
+		static::$app->input->set_post( static::$test->get_post_field_name( 'test11' ), '11' );
+		$params = static::$test->get_update_data_params( $data['post'], false );
 		$this->assertArrayNotHasKey( 'test1', $params );
 		$this->assertArrayNotHasKey( 'test2', $params );
 		$this->assertEquals( 0, $params['test3'] );
@@ -744,9 +745,9 @@ class Custom_Post extends TestCase {
 		$this->assertNull( $params['test14'] );
 		$this->assertEquals( 0, $params['test15'] );
 
-		static::$app->input->delete_post( static::$_test->get_post_field_name( 'test7' ) );
-		static::$app->input->delete_post( static::$_test->get_post_field_name( 'test11' ) );
-		$params = static::$_test->get_update_data_params( $data['post'], true );
+		static::$app->input->delete_post( static::$test->get_post_field_name( 'test7' ) );
+		static::$app->input->delete_post( static::$test->get_post_field_name( 'test11' ) );
+		$params = static::$test->get_update_data_params( $data['post'], true );
 		$this->assertArrayNotHasKey( 'test1', $params );
 		$this->assertArrayNotHasKey( 'test2', $params );
 		$this->assertEquals( 0, $params['test3'] );
@@ -771,25 +772,25 @@ class Custom_Post extends TestCase {
 	 * @depends test_get_update_data_params1
 	 */
 	public function test_get_update_data_params2() {
-		$data = static::$_test->get_list_data()['data'][0];
+		$data = static::$app->array->get( static::$test->get_list_data(), 'data.0' );
 
-		static::$app->input->set_post( static::$_test->get_post_field_name( 'test1' ), 'test100' );
-		static::$app->input->set_post( static::$_test->get_post_field_name( 'test2' ), '100' );
-		static::$app->input->set_post( static::$_test->get_post_field_name( 'test3' ), '1' );
-		static::$app->input->set_post( static::$_test->get_post_field_name( 'test4' ), 'test400' );
-		static::$app->input->set_post( static::$_test->get_post_field_name( 'test5' ), 'test500' );
-		static::$app->input->set_post( static::$_test->get_post_field_name( 'test6' ), 'test600' );
-		static::$app->input->set_post( static::$_test->get_post_field_name( 'test7' ), 'test700' );
-		static::$app->input->set_post( static::$_test->get_post_field_name( 'test8' ), '800' );
-		static::$app->input->set_post( static::$_test->get_post_field_name( 'test9' ), '900' );
-		static::$app->input->set_post( static::$_test->get_post_field_name( 'test10' ), '1000' );
-		static::$app->input->set_post( static::$_test->get_post_field_name( 'test11' ), '1100' );
-		static::$app->input->set_post( static::$_test->get_post_field_name( 'test12' ), '1' );
-		static::$app->input->set_post( static::$_test->get_post_field_name( 'test13' ), '0' );
-		static::$app->input->set_post( static::$_test->get_post_field_name( 'test14' ), '1' );
-		static::$app->input->set_post( static::$_test->get_post_field_name( 'test15' ), 'false' );
+		static::$app->input->set_post( static::$test->get_post_field_name( 'test1' ), 'test100' );
+		static::$app->input->set_post( static::$test->get_post_field_name( 'test2' ), '100' );
+		static::$app->input->set_post( static::$test->get_post_field_name( 'test3' ), '1' );
+		static::$app->input->set_post( static::$test->get_post_field_name( 'test4' ), 'test400' );
+		static::$app->input->set_post( static::$test->get_post_field_name( 'test5' ), 'test500' );
+		static::$app->input->set_post( static::$test->get_post_field_name( 'test6' ), 'test600' );
+		static::$app->input->set_post( static::$test->get_post_field_name( 'test7' ), 'test700' );
+		static::$app->input->set_post( static::$test->get_post_field_name( 'test8' ), '800' );
+		static::$app->input->set_post( static::$test->get_post_field_name( 'test9' ), '900' );
+		static::$app->input->set_post( static::$test->get_post_field_name( 'test10' ), '1000' );
+		static::$app->input->set_post( static::$test->get_post_field_name( 'test11' ), '1100' );
+		static::$app->input->set_post( static::$test->get_post_field_name( 'test12' ), '1' );
+		static::$app->input->set_post( static::$test->get_post_field_name( 'test13' ), '0' );
+		static::$app->input->set_post( static::$test->get_post_field_name( 'test14' ), '1' );
+		static::$app->input->set_post( static::$test->get_post_field_name( 'test15' ), 'false' );
 
-		$params = static::$_test->get_update_data_params( $data['post'], false );
+		$params = static::$test->get_update_data_params( $data['post'], false );
 		$this->assertEquals( $params['test1'], 'test100' );
 		$this->assertEquals( $params['test2'], 100 );
 		$this->assertEquals( $params['test3'], 1 );
@@ -806,7 +807,7 @@ class Custom_Post extends TestCase {
 		$this->assertEquals( $params['test14'], 1 );
 		$this->assertEquals( $params['test15'], 0 );
 
-		$params = static::$_test->get_update_data_params( $data['post'], true );
+		$params = static::$test->get_update_data_params( $data['post'], true );
 		$this->assertEquals( $params['test1'], 'test100' );
 		$this->assertEquals( $params['test2'], 100 );
 		$this->assertEquals( $params['test3'], 1 );
@@ -828,25 +829,25 @@ class Custom_Post extends TestCase {
 	 * @depends test_get_update_data_params2
 	 */
 	public function test_get_update_data_params3() {
-		$data = static::$_test->get_list_data()['data'][0];
+		$data = static::$app->array->get( static::$test->get_list_data(), 'data.0' );
 
-		static::$app->input->set_post( static::$_test->get_post_field_name( 'test1' ), '' );
-		static::$app->input->set_post( static::$_test->get_post_field_name( 'test2' ), '' );
-		static::$app->input->set_post( static::$_test->get_post_field_name( 'test3' ), '' );
-		static::$app->input->set_post( static::$_test->get_post_field_name( 'test4' ), '' );
-		static::$app->input->set_post( static::$_test->get_post_field_name( 'test5' ), '' );
-		static::$app->input->set_post( static::$_test->get_post_field_name( 'test6' ), '' );
-		static::$app->input->set_post( static::$_test->get_post_field_name( 'test7' ), '' );
-		static::$app->input->set_post( static::$_test->get_post_field_name( 'test8' ), '' );
-		static::$app->input->set_post( static::$_test->get_post_field_name( 'test9' ), '' );
-		static::$app->input->set_post( static::$_test->get_post_field_name( 'test10' ), '' );
-		static::$app->input->set_post( static::$_test->get_post_field_name( 'test11' ), '11' );
-		static::$app->input->set_post( static::$_test->get_post_field_name( 'test12' ), '' );
-		static::$app->input->set_post( static::$_test->get_post_field_name( 'test13' ), '' );
-		static::$app->input->set_post( static::$_test->get_post_field_name( 'test14' ), '' );
-		static::$app->input->set_post( static::$_test->get_post_field_name( 'test15' ), '' );
+		static::$app->input->set_post( static::$test->get_post_field_name( 'test1' ), '' );
+		static::$app->input->set_post( static::$test->get_post_field_name( 'test2' ), '' );
+		static::$app->input->set_post( static::$test->get_post_field_name( 'test3' ), '' );
+		static::$app->input->set_post( static::$test->get_post_field_name( 'test4' ), '' );
+		static::$app->input->set_post( static::$test->get_post_field_name( 'test5' ), '' );
+		static::$app->input->set_post( static::$test->get_post_field_name( 'test6' ), '' );
+		static::$app->input->set_post( static::$test->get_post_field_name( 'test7' ), '' );
+		static::$app->input->set_post( static::$test->get_post_field_name( 'test8' ), '' );
+		static::$app->input->set_post( static::$test->get_post_field_name( 'test9' ), '' );
+		static::$app->input->set_post( static::$test->get_post_field_name( 'test10' ), '' );
+		static::$app->input->set_post( static::$test->get_post_field_name( 'test11' ), '11' );
+		static::$app->input->set_post( static::$test->get_post_field_name( 'test12' ), '' );
+		static::$app->input->set_post( static::$test->get_post_field_name( 'test13' ), '' );
+		static::$app->input->set_post( static::$test->get_post_field_name( 'test14' ), '' );
+		static::$app->input->set_post( static::$test->get_post_field_name( 'test15' ), '' );
 
-		$params = static::$_test->get_update_data_params( $data['post'], false );
+		$params = static::$test->get_update_data_params( $data['post'], false );
 		$this->assertEquals( $params['test1'], 'test1' );
 		$this->assertEquals( $params['test2'], 10 );
 		$this->assertEquals( $params['test3'], 1 );
@@ -866,7 +867,7 @@ class Custom_Post extends TestCase {
 		$this->assertNull( $params['test14'] );
 		$this->assertEquals( 0, $params['test15'] );
 
-		$params = static::$_test->get_update_data_params( $data['post'], true );
+		$params = static::$test->get_update_data_params( $data['post'], true );
 		$this->assertEquals( $params['test1'], 'test1' );
 		$this->assertEquals( $params['test2'], 10 );
 		$this->assertEquals( $params['test3'], 1 );
@@ -891,26 +892,26 @@ class Custom_Post extends TestCase {
 	 * @depends      test_update
 	 */
 	public function test_delete_data() {
-		foreach ( static::$_test->get_list_data( null, false )['data'] as $data ) {
+		foreach ( static::$app->array->get( static::$test->get_list_data( null, false ), 'data' ) as $data ) {
 			$this->assertInstanceOf( '\WP_Post', wp_delete_post( $data['post_id'] ) );
 		}
 	}
 
 	/**
-	 * @dataProvider _test_is_empty2_provider
+	 * @dataProvider provider_test_is_empty2
 	 * @depends      test_delete_data
 	 *
 	 * @param bool $expected
 	 * @param bool $only_publish
 	 */
 	public function test_is_empty2( $expected, $only_publish ) {
-		$this->assertEquals( $expected, static::$_test->is_empty( $only_publish ) );
+		$this->assertEquals( $expected, static::$test->is_empty( $only_publish ) );
 	}
 
 	/**
 	 * @return array
 	 */
-	public function _test_is_empty2_provider() {
+	public function provider_test_is_empty2() {
 		return [
 			[ true, false ],
 			[ true, true ],

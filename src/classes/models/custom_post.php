@@ -26,30 +26,32 @@ if ( ! defined( 'WP_CONTENT_FRAMEWORK' ) ) {
 /**
  * Class Custom_Post
  * @package WP_Framework_Custom_Post\Classes\Models
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework_Presenter\Interfaces\Presenter, \WP_Framework_Common\Interfaces\Uninstall {
 
 	use Loader, Presenter, Uninstall, Package;
 
 	/**
-	 * @var \WP_Framework_Custom_Post\Interfaces\Custom_Post[] $_custom_posts
+	 * @var \WP_Framework_Custom_Post\Interfaces\Custom_Post[] $custom_posts
 	 */
-	private $_custom_posts;
+	private $custom_posts;
 
 	/**
-	 * @var string[] $_custom_posts_mapper
+	 * @var string[] $custom_posts_mapper
 	 */
-	private $_custom_posts_mapper;
+	private $custom_posts_mapper;
 
 	/**
-	 * @var false|array $_validation_errors
+	 * @var false|array $validation_errors
 	 */
-	private $_validation_errors = false;
+	private $validation_errors = false;
 
 	/**
 	 * register post types
+	 * @noinspection PhpUnusedPrivateMethodInspection
+	 * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
 	 */
-	/** @noinspection PhpUnusedPrivateMethodInspection */
 	private function register_post_types() {
 		$this->get_custom_posts();
 	}
@@ -59,8 +61,9 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 	 * @param string $post_type
 	 *
 	 * @return array
+	 * @noinspection PhpUnusedPrivateMethodInspection
+	 * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
 	 */
-	/** @noinspection PhpUnusedPrivateMethodInspection */
 	private function manage_posts_columns( array $columns, $post_type ) {
 		if ( $this->is_valid_custom_post_type( $post_type ) ) {
 			$custom_post = $this->get_custom_post_type( $post_type );
@@ -79,8 +82,10 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 	/**
 	 * @param string $column_name
 	 * @param int $post_id
+	 *
+	 * @noinspection PhpUnusedPrivateMethodInspection
+	 * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
 	 */
-	/** @noinspection PhpUnusedPrivateMethodInspection */
 	private function manage_posts_custom_column( $column_name, $post_id ) {
 		$post        = get_post( $post_id );
 		$post_type   = $post->post_type;
@@ -95,8 +100,9 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 	 * @param WP_Post $post
 	 *
 	 * @return array
+	 * @noinspection PhpUnusedPrivateMethodInspection
+	 * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
 	 */
-	/** @noinspection PhpUnusedPrivateMethodInspection */
 	private function post_row_actions( array $actions, WP_Post $post ) {
 		if ( $this->is_valid_custom_post_type( $post->post_type ) ) {
 			$custom_post = $this->get_custom_post_type( $post->post_type );
@@ -112,8 +118,9 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 	 * @param WP_Query|string $wp_query $wp_query
 	 *
 	 * @return string
+	 * @noinspection PhpUnusedPrivateMethodInspection
+	 * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
 	 */
-	/** @noinspection PhpUnusedPrivateMethodInspection */
 	private function posts_search( $search, $wp_query ) {
 		if ( is_string( $wp_query ) ) {
 			$post_type = $wp_query;
@@ -138,7 +145,6 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 	 *
 	 * @return string
 	 */
-	/** @noinspection PhpUnusedPrivateMethodInspection */
 	private function posts_join( $join, $wp_query ) {
 		if ( is_string( $wp_query ) ) {
 			$post_type = $wp_query;
@@ -159,8 +165,10 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 
 	/**
 	 * @param WP_Query $wp_query
+	 *
+	 * @noinspection PhpUnusedPrivateMethodInspection
+	 * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
 	 */
-	/** @noinspection PhpUnusedPrivateMethodInspection */
 	private function setup_posts_orderby( $wp_query ) {
 		if ( ! $wp_query->is_admin ) {
 			return;
@@ -185,15 +193,16 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 	 * @param string $perm
 	 *
 	 * @return array|bool|mixed|object|stdClass
+	 * @noinspection PhpUnusedPrivateMethodInspection
+	 * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
 	 */
-	/** @noinspection PhpUnusedPrivateMethodInspection */
 	private function wp_count_posts( $counts, $type = 'post', $perm = '' ) {
 		if ( ! is_admin() || ! $this->is_valid_custom_post_type( $type ) ) {
 			return $counts;
 		}
 
 		if ( ! post_type_exists( $type ) ) {
-			return new stdClass;
+			return new stdClass();
 		}
 
 		$cache_key = _count_posts_cache_key( $type, $perm ) . '_author';
@@ -202,12 +211,11 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 			return $cached;
 		}
 
-		/** @noinspection SqlResolve */
 		$query = "SELECT post_status, COUNT( * ) AS num_posts FROM {$this->get_wp_table('posts')} ";
-		$query .= $this->posts_join( '', $type );
-		$query .= ' WHERE post_type = %s GROUP BY post_status';
+		$query = $query . $this->posts_join( '', $type );
+		$query = $query . ' WHERE post_type = %s GROUP BY post_status';
 
-		$results = (array) $this->wpdb()->get_results( $this->wpdb()->prepare( $query, $type ), ARRAY_A );
+		$results = (array) $this->wpdb()->get_results( $this->wpdb()->prepare( $query, $type ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		$counts  = array_fill_keys( get_post_stati(), 0 );
 		foreach ( $results as $row ) {
 			$counts[ $row['post_status'] ] = $row['num_posts'];
@@ -222,8 +230,10 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 	 * @param int $post_id
 	 * @param WP_Post $post
 	 * @param bool $update
+	 *
+	 * @noinspection PhpUnusedPrivateMethodInspection
+	 * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
 	 */
-	/** @noinspection PhpUnusedPrivateMethodInspection */
 	private function save_post( $post_id, WP_Post $post, $update ) {
 		if ( $this->is_valid_update( $post->post_status, $post->post_type ) ) {
 			$custom_post = $this->get_custom_post_type( $post->post_type );
@@ -240,25 +250,9 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 					$old = false;
 				}
 				if ( ! $this->app->db->transaction( function () use ( $custom_post, $post_id, $post, $update, $old ) {
-					$id = $custom_post->update_data( [
-						'post_id' => $post_id,
-					], [
-						'post_id' => $post_id,
-					], $post, $update );
-					if ( ! empty( $id ) ) {
-						$data = $custom_post->get_data( $id );
-						if ( $data ) {
-							if ( $update ) {
-								$custom_post->data_updated( $post_id, $post, $old, $data );
-							} else {
-								$custom_post->data_inserted( $post_id, $post, $data );
-							}
-						}
-					} else {
-						throw new Exception( $this->app->db->get_last_error() );
-					}
+					$this->update_data( $custom_post, $post_id, $post, $update, $old );
 				} ) ) {
-					$this->_validation_errors = [
+					$this->validation_errors = [
 						'Db error' => [
 							$this->app->db->get_last_transaction_error()->getMessage(),
 						],
@@ -269,10 +263,46 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 	}
 
 	/**
+	 * @param \WP_Framework_Custom_Post\Interfaces\Custom_Post $custom_post
 	 * @param int $post_id
 	 * @param WP_Post $post
+	 * @param bool $update
+	 * @param mixed $old
+	 *
+	 * @throws Exception
 	 */
-	/** @noinspection PhpUnusedPrivateMethodInspection */
+	private function update_data( $custom_post, $post_id, $post, $update, $old ) {
+		$id = $custom_post->update_data(
+			[
+				'post_id' => $post_id,
+			],
+			[
+				'post_id' => $post_id,
+			],
+			$post,
+			$update
+		);
+		if ( ! empty( $id ) ) {
+			$data = $custom_post->get_data( $id );
+			if ( $data ) {
+				if ( $update ) {
+					$custom_post->data_updated( $post_id, $post, $old, $data );
+				} else {
+					$custom_post->data_inserted( $post_id, $post, $data );
+				}
+			}
+		} else {
+			throw new Exception( $this->app->db->get_last_error() );
+		}
+	}
+
+	/**
+	 * @param int $post_id
+	 * @param WP_Post $post
+	 *
+	 * @noinspection PhpUnusedPrivateMethodInspection
+	 * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
+	 */
 	private function untrash_post( $post_id, WP_Post $post ) {
 		if ( $this->is_valid_update( $post->post_status, $post->post_type, true ) ) {
 			$custom_post = $this->get_custom_post_type( $post->post_type );
@@ -284,8 +314,10 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 
 	/**
 	 * @param int $post_id
+	 *
+	 * @noinspection PhpUnusedPrivateMethodInspection
+	 * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
 	 */
-	/** @noinspection PhpUnusedPrivateMethodInspection */
 	private function wp_trash_post( $post_id ) {
 		$post        = get_post( $post_id );
 		$post_type   = $post->post_type;
@@ -297,8 +329,10 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 
 	/**
 	 * @param int $post_id
+	 *
+	 * @noinspection PhpUnusedPrivateMethodInspection
+	 * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
 	 */
-	/** @noinspection PhpUnusedPrivateMethodInspection */
 	private function delete_post( $post_id ) {
 		$post        = get_post( $post_id );
 		$post_type   = $post->post_type;
@@ -313,19 +347,20 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 	 * @param array $post_array
 	 *
 	 * @return bool
+	 * @noinspection PhpUnusedPrivateMethodInspection
+	 * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
 	 */
-	/** @noinspection PhpUnusedPrivateMethodInspection */
 	private function post_validation( $maybe_empty, array $post_array ) {
 		if ( $this->is_valid_update( $post_array['post_status'], $post_array['post_type'] ) ) {
 			$custom_post = $this->get_custom_post_type( $post_array['post_type'] );
 			if ( ! empty( $custom_post ) ) {
 				$errors = $custom_post->validate_input( $post_array );
 				if ( ! empty( $errors ) ) {
-					$this->_validation_errors = $errors;
+					$this->validation_errors = $errors;
 
 					return true;
 				} else {
-					$this->_validation_errors = false;
+					$this->validation_errors = false;
 				}
 			}
 		}
@@ -338,8 +373,9 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 	 * @param array $post_array
 	 *
 	 * @return array
+	 * @noinspection PhpUnusedPrivateMethodInspection
+	 * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
 	 */
-	/** @noinspection PhpUnusedPrivateMethodInspection */
 	private function wp_insert_post_data( array $data, array $post_array ) {
 		if ( $this->is_valid_update( $post_array['post_status'], $post_array['post_type'] ) ) {
 			$custom_post = $this->get_custom_post_type( $post_array['post_type'] );
@@ -357,8 +393,10 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 	 * @param array $userdata
 	 *
 	 * @return bool
+	 * @noinspection PhpUnusedPrivateMethodInspection
+	 * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
+	 * @SuppressWarnings(PHPMD.UnusedFormalParameter)
 	 */
-	/** @noinspection PhpUnusedPrivateMethodInspection */
 	private function send_email_change_email(
 		/** @noinspection PhpUnusedParameterInspection */
 		$result, array $user, array $userdata
@@ -377,8 +415,10 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 	 * @param array $userdata
 	 *
 	 * @return bool
+	 * @noinspection PhpUnusedPrivateMethodInspection
+	 * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
+	 * @SuppressWarnings(PHPMD.UnusedFormalParameter)
 	 */
-	/** @noinspection PhpUnusedPrivateMethodInspection */
 	private function send_password_change_email(
 		/** @noinspection PhpUnusedParameterInspection */
 		$result, array $user, array $userdata
@@ -396,15 +436,17 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 	 * @param int $post_id
 	 *
 	 * @return string
+	 * @noinspection PhpUnusedPrivateMethodInspection
+	 * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
+	 * @SuppressWarnings(PHPMD.UnusedFormalParameter)
 	 */
-	/** @noinspection PhpUnusedPrivateMethodInspection */
 	private function redirect_post_location(
 		/** @noinspection PhpUnusedParameterInspection */
 		$location, $post_id
 	) {
-		if ( ! empty( $this->_validation_errors ) ) {
+		if ( ! empty( $this->validation_errors ) ) {
 			$location = remove_query_arg( 'message', $location );
-			$this->app->set_session( 'validation_errors', $this->_validation_errors, 60 );
+			$this->app->set_session( 'validation_errors', $this->validation_errors, 60 );
 			$this->app->set_session( $this->get_old_post_session_key(), $this->app->input->post(), 60 );
 		} else {
 			global $typenow;
@@ -419,8 +461,9 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 
 	/**
 	 * setup list
+	 * @noinspection PhpUnusedPrivateMethodInspection
+	 * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
 	 */
-	/** @noinspection PhpUnusedPrivateMethodInspection */
 	private function setup_list() {
 		global $typenow;
 		$custom_post = $this->get_custom_post_type( $typenow );
@@ -437,8 +480,9 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 
 	/**
 	 * setup page
+	 * @noinspection PhpUnusedPrivateMethodInspection
+	 * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
 	 */
-	/** @noinspection PhpUnusedPrivateMethodInspection */
 	private function setup_page() {
 		global $typenow;
 		if ( $this->is_valid_custom_post_type( $typenow ) ) {
@@ -451,8 +495,9 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 
 	/**
 	 * admin notices
+	 * @noinspection PhpUnusedPrivateMethodInspection
+	 * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
 	 */
-	/** @noinspection PhpUnusedPrivateMethodInspection */
 	private function set_admin_notices() {
 		global $typenow;
 		if ( $this->is_valid_custom_post_type( $typenow ) ) {
@@ -480,8 +525,10 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 
 	/**
 	 * @param WP_Post $post
+	 *
+	 * @noinspection PhpUnusedPrivateMethodInspection
+	 * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
 	 */
-	/** @noinspection PhpUnusedPrivateMethodInspection */
 	private function edit_form_after_title( WP_Post $post ) {
 		if ( $this->is_valid_custom_post_type( $post->post_type ) ) {
 			$custom_post = $this->get_custom_post_type( $post->post_type );
@@ -498,8 +545,10 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 
 	/**
 	 * @param WP_Post $post
+	 *
+	 * @noinspection PhpUnusedPrivateMethodInspection
+	 * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
 	 */
-	/** @noinspection PhpUnusedPrivateMethodInspection */
 	private function edit_form_after_editor( WP_Post $post ) {
 		if ( $this->is_valid_custom_post_type( $post->post_type ) ) {
 			$custom_post = $this->get_custom_post_type( $post->post_type );
@@ -536,21 +585,21 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 	 * @return \WP_Framework_Custom_Post\Interfaces\Custom_Post[]
 	 */
 	public function get_custom_posts() {
-		if ( ! isset( $this->_custom_posts ) ) {
-			$this->_custom_posts        = $this->get_class_list();
-			$post_types                 = array_map( function ( $d ) {
-				/** @var \WP_Framework_Custom_Post\Interfaces\Custom_Post $d */
-				return $d->get_post_type();
-			}, $this->_custom_posts );
-			$this->_custom_posts_mapper = array_map( function ( $d ) {
-				/** @var \WP_Framework_Custom_Post\Interfaces\Custom_Post $d */
-				return $d->get_post_type_slug();
-			}, $this->_custom_posts );
-			$this->_custom_posts        = array_combine( $post_types, $this->_custom_posts );
-			$this->_custom_posts_mapper = array_combine( $this->_custom_posts_mapper, $post_types );
+		if ( ! isset( $this->custom_posts ) ) {
+			$this->custom_posts        = $this->get_class_list();
+			$post_types                = array_map( function ( $data ) {
+				/** @var \WP_Framework_Custom_Post\Interfaces\Custom_Post $data */
+				return $data->get_post_type();
+			}, $this->custom_posts );
+			$this->custom_posts_mapper = array_map( function ( $data ) {
+				/** @var \WP_Framework_Custom_Post\Interfaces\Custom_Post $data */
+				return $data->get_post_type_slug();
+			}, $this->custom_posts );
+			$this->custom_posts        = array_combine( $post_types, $this->custom_posts );
+			$this->custom_posts_mapper = array_combine( $this->custom_posts_mapper, $post_types );
 		}
 
-		return $this->_custom_posts;
+		return $this->custom_posts;
 	}
 
 	/**
@@ -568,11 +617,11 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 	 * @return \WP_Framework_Custom_Post\Interfaces\Custom_Post|null
 	 */
 	public function get_post_type_by_slug( $slug ) {
-		if ( ! isset( $this->_custom_posts_mapper[ $slug ] ) ) {
+		if ( ! isset( $this->custom_posts_mapper[ $slug ] ) ) {
 			return null;
 		}
 
-		return $this->get_custom_post_type( $this->_custom_posts_mapper[ $slug ] );
+		return $this->get_custom_post_type( $this->custom_posts_mapper[ $slug ] );
 	}
 
 	/**
@@ -613,20 +662,27 @@ class Custom_Post implements \WP_Framework_Core\Interfaces\Loader, \WP_Framework
 	 * @return bool
 	 */
 	private function is_valid_update( $post_status, $post_type, $untrash = false ) {
-		return ! $this->app->utility->is_autosave() && in_array( $post_status, [
-				'publish',
-				'future',
-				'draft',
-				'pending',
-				'private',
-			] ) && $this->is_valid_custom_post_type( $post_type ) && ( $untrash === ( 'untrash' === $this->app->input->get( 'action' ) ) );
+		return ! $this->app->utility->is_autosave() && in_array( $post_status, $this->get_valid_statuses(), true ) && $this->is_valid_custom_post_type( $post_type ) && ( ( 'untrash' === $this->app->input->get( 'action' ) ) === $untrash );
+	}
+
+	/**
+	 * @return array
+	 */
+	private function get_valid_statuses() {
+		return [
+			'publish',
+			'future',
+			'draft',
+			'pending',
+			'private',
+		];
 	}
 
 	/**
 	 * @return array|false
 	 */
 	public function get_validation_errors() {
-		return $this->_validation_errors;
+		return $this->validation_errors;
 	}
 
 	/**

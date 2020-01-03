@@ -13,7 +13,5 @@ if ( ! defined( 'WP_CONTENT_FRAMEWORK' ) ) {
 }
 
 return [
-
 	'custom_post' => '\WP_Framework_Custom_Post\Classes\Models\Custom_Post',
-
 ];

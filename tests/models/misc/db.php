@@ -26,7 +26,6 @@ class Db extends \WP_Framework_Db\Classes\Models\Db {
 	 * initialize
 	 */
 	protected function initialize() {
-
 	}
 
 	/**
@@ -51,7 +50,7 @@ class Db extends \WP_Framework_Db\Classes\Models\Db {
 		global $wpdb;
 
 		$sql = 'DROP TABLE IF EXISTS `' . $this->get_table( $table ) . '`';
-		$wpdb->query( $sql );
+		$wpdb->query( $sql ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 	}
 
 	/**
@@ -59,7 +58,7 @@ class Db extends \WP_Framework_Db\Classes\Models\Db {
 	 *
 	 * @return array
 	 */
-	public function _table_update( $table ) {
+	public function wrap_table_update( $table ) {
 		return $this->table_update( $table, $this->table_defines[ $table ] );
 	}
 }

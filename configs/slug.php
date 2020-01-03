@@ -13,8 +13,6 @@ if ( ! defined( 'WP_CONTENT_FRAMEWORK' ) ) {
 }
 
 return [
-
 	// post field name prefix
 	'post_field_name_prefix' => '',
-
 ];

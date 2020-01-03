@@ -37,19 +37,19 @@ trait Custom_Post {
 	use Singleton, Hook, Presenter, Package;
 
 	/**
-	 * @var string $_slug
+	 * @var string $slug
 	 */
-	private $_slug;
+	private $slug;
 
 	/**
-	 * @var array $_related_data
+	 * @var array $related_data
 	 */
-	private $_related_data = [];
+	private $related_data = [];
 
 	/**
-	 * @var WP_Post_Type|WP_Error $_post_type_obj
+	 * @var WP_Post_Type|WP_Error $post_type_obj
 	 */
-	private $_post_type_obj;
+	private $post_type_obj;
 
 	/**
 	 * initialized
@@ -73,10 +73,10 @@ trait Custom_Post {
 	 * register post type
 	 */
 	private function register_post_type() {
-		$post_type            = $this->get_post_type();
-		$this->_post_type_obj = register_post_type( $post_type, $this->get_post_type_args() );
-		if ( is_wp_error( $this->_post_type_obj ) ) {
-			$this->app->log( $this->_post_type_obj );
+		$post_type           = $this->get_post_type();
+		$this->post_type_obj = register_post_type( $post_type, $this->get_post_type_args() );
+		if ( is_wp_error( $this->post_type_obj ) ) {
+			$this->app->log( $this->post_type_obj );
 
 			return;
 		}
@@ -113,7 +113,7 @@ trait Custom_Post {
 	 *
 	 * @return array
 	 */
-	private function _set_post( array $data, array $_data, $convert_name ) {
+	private function set_post( array $data, array $_data, $convert_name ) {
 		unset( $data['post_type'] );
 		unset( $data['post_title'] );
 		unset( $data['post_content'] );
@@ -139,14 +139,14 @@ trait Custom_Post {
 	 *
 	 * @return mixed
 	 */
-	private function _insert( array $data, $convert_name, $callback ) {
+	private function insert_common( array $data, $convert_name, $callback ) {
 		$_data                 = [];
 		$_data['post_type']    = $this->get_post_type();
 		$_data['post_title']   = $this->app->array->get( $data, 'post_title', '' );
 		$_data['post_content'] = $this->app->array->get( $data, 'post_content', '' );
 		$_data['post_excerpt'] = $this->app->array->get( $data, 'post_excerpt', '' );
 		$_data['post_status']  = $this->app->array->get( $data, 'post_status', 'publish' );
-		$_data                 = $this->_set_post( $data, $_data, $convert_name );
+		$_data                 = $this->set_post( $data, $_data, $convert_name );
 
 		return $callback( $_data );
 	}
@@ -159,7 +159,7 @@ trait Custom_Post {
 	 * @return array|bool|int
 	 */
 	public function insert( array $data, $convert_name = true, $wp_error = false ) {
-		return $this->_insert( $data, $convert_name, function ( $data ) use ( $wp_error ) {
+		return $this->insert_common( $data, $convert_name, function ( $data ) use ( $wp_error ) {
 			return wp_insert_post( $data, $wp_error );
 		} );
 	}
@@ -171,7 +171,7 @@ trait Custom_Post {
 	 * @return array
 	 */
 	public function validate_insert( array $data, $convert_name = true ) {
-		return $this->_insert( $data, $convert_name, function ( $data ) {
+		return $this->insert_common( $data, $convert_name, function ( $data ) {
 			return $this->validate_input( $data );
 		} );
 	}
@@ -188,21 +188,27 @@ trait Custom_Post {
 			return false;
 		}
 		if ( ! empty( $where['id'] ) ) {
-			$d = $this->get_data( $where['id'] );
+			$custom_post_data = $this->get_data( $where['id'] );
 		} else {
-			$d = $this->get_related_data( $where['post_id'] );
+			$custom_post_data = $this->get_related_data( $where['post_id'] );
 		}
-		if ( empty( $d ) ) {
+		if ( empty( $custom_post_data ) ) {
 			return false;
 		}
 
 		$_data              = [];
-		$_data['ID']        = $d['post_id'];
+		$_data['ID']        = $custom_post_data['post_id'];
 		$_data['post_type'] = $this->get_post_type();
-		! empty( $data['post_title'] ) and $_data['post_title'] = $data['post_title'];
-		! empty( $data['post_content'] ) and $_data['post_content'] = $data['post_content'];
-		! empty( $data['post_status'] ) and $_data['post_status'] = $data['post_status'];
-		$_data = $this->_set_post( $data, $_data, $convert_name );
+		if ( ! empty( $data['post_title'] ) ) {
+			$_data['post_title'] = $data['post_title'];
+		}
+		if ( ! empty( $data['post_content'] ) ) {
+			$_data['post_content'] = $data['post_content'];
+		}
+		if ( ! empty( $data['post_status'] ) ) {
+			$_data['post_status'] = $data['post_status'];
+		}
+		$_data = $this->set_post( $data, $_data, $convert_name );
 
 		return wp_update_post( $_data );
 	}
@@ -211,9 +217,11 @@ trait Custom_Post {
 	 * @return string
 	 */
 	public function get_post_type_slug() {
-		! isset( $this->_slug ) and $this->_slug = $this->get_file_slug();
+		if ( ! isset( $this->slug ) ) {
+			$this->slug = $this->get_file_slug();
+		}
 
-		return $this->_slug;
+		return $this->slug;
 	}
 
 	/**
@@ -234,7 +242,7 @@ trait Custom_Post {
 	 * @return WP_Post_Type|WP_Error
 	 */
 	public function get_post_type_object() {
-		return $this->_post_type_obj;
+		return $this->post_type_obj;
 	}
 
 	/**
@@ -243,22 +251,22 @@ trait Custom_Post {
 	 * @return bool
 	 */
 	public function user_can( $capability ) {
-		if ( ! ( $this->_post_type_obj instanceof WP_Post_Type ) ) {
+		if ( ! ( $this->post_type_obj instanceof WP_Post_Type ) ) {
 			return false;
 		}
 
-		return ! empty( $this->_post_type_obj->cap->$capability );
+		return ! empty( $this->post_type_obj->cap->$capability );
 	}
 
 	/**
 	 * @return array
 	 */
-	protected abstract function get_capabilities();
+	abstract protected function get_capabilities();
 
 	/**
 	 * @return string|false
 	 */
-	protected abstract function get_post_type_parent();
+	abstract protected function get_post_type_parent();
 
 	/**
 	 * @param array|null $capabilities
@@ -288,7 +296,10 @@ trait Custom_Post {
 			'capabilities'        => $capabilities,
 			'map_meta_cap'        => true,
 			'hierarchical'        => false,
-			'rewrite'             => [ 'slug' => $this->get_post_type_slug(), 'with_front' => false ],
+			'rewrite'             => [
+				'slug'       => $this->get_post_type_slug(),
+				'with_front' => false,
+			],
 			'query_var'           => true,
 			'menu_icon'           => $this->get_post_type_menu_icon(),
 			'supports'            => $this->get_post_type_supports(),
@@ -373,10 +384,7 @@ trait Custom_Post {
 	 *
 	 * @return string
 	 */
-	public function posts_search(
-		/** @noinspection PhpUnusedParameterInspection */
-		$search, WP_Query $wp_query
-	) {
+	public function posts_search( $search, WP_Query $wp_query ) {
 		if ( ! $wp_query->is_search() || ! $wp_query->is_main_query() || ! is_admin() || empty( $wp_query->query_vars['search_terms'] ) ) {
 			return $search;
 		}
@@ -388,12 +396,12 @@ trait Custom_Post {
 
 		$exclusion_prefix = apply_filters( 'wp_query_search_exclusion_prefix', '-' );
 		$search           = '';
-		$q                = $wp_query->query_vars;
-		$n                = ! empty( $q['exact'] ) ? '' : '%';
+		$query            = $wp_query->query_vars;
+		$percent          = ! empty( $query['exact'] ) ? '' : '%';
 		$table            = $this->app->db->get_table( $this->get_related_table_name() );
 
-		foreach ( $q['search_terms'] as $term ) {
-			$exclude = $exclusion_prefix && ( $exclusion_prefix === substr( $term, 0, 1 ) );
+		foreach ( $query['search_terms'] as $term ) {
+			$exclude = $exclusion_prefix && substr( $term, 0, 1 ) === $exclusion_prefix;
 			if ( $exclude ) {
 				$like_op  = 'NOT LIKE';
 				$andor_op = 'AND';
@@ -410,12 +418,12 @@ trait Custom_Post {
 			$fields[]   = "{$this->get_wp_table('posts')}.post_title";
 			$fields[]   = "{$this->get_wp_table('posts')}.post_excerpt";
 			$fields[]   = "{$this->get_wp_table('posts')}.post_content";
-			$like       = $n . $this->wpdb()->esc_like( $term ) . $n;
+			$like       = $percent . $this->wpdb()->esc_like( $term ) . $percent;
 			foreach ( $fields as $field ) {
-				$conditions[] = $this->wpdb()->prepare( "({$field} $like_op %s)", $like );
+				$conditions[] = $this->wpdb()->prepare( "({$field} $like_op %s)", $like ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			}
 			$conditions = implode( " {$andor_op} ", $conditions );
-			$search     .= " AND ({$conditions})";
+			$search     = $search . " AND ({$conditions})";
 		}
 
 		return $search;
@@ -433,13 +441,14 @@ trait Custom_Post {
 	 * @param WP_Query|string $wp_query
 	 *
 	 * @return string
+	 * @SuppressWarnings(PHPMD.UnusedFormalParameter)
 	 */
 	public function posts_join(
 		/** @noinspection PhpUnusedParameterInspection */
 		$join, $wp_query
 	) {
 		$table = $this->app->db->get_table( $this->get_related_table_name() );
-		$join  .= " INNER JOIN {$table} ON {$table}.post_id = {$this->get_wp_table('posts')}.ID ";
+		$join  = $join . " INNER JOIN {$table} ON {$table}.post_id = {$this->get_wp_table('posts')}.ID ";
 
 		return $join;
 	}
@@ -522,7 +531,7 @@ trait Custom_Post {
 	 * @return bool
 	 */
 	private function is_valid_export_post_status() {
-		return ! in_array( $this->app->input->request( 'post_status', 'all' ), $this->get_exclude_from_search_post_status() );
+		return ! in_array( $this->app->input->request( 'post_status', 'all' ), $this->get_exclude_from_search_post_status(), true );
 	}
 
 	/**
@@ -567,6 +576,7 @@ trait Custom_Post {
 	 * @param WP_Post $post
 	 *
 	 * @return array
+	 * @SuppressWarnings(PHPMD.UnusedFormalParameter)
 	 */
 	protected function filter_post_row_actions(
 		/** @noinspection PhpUnusedParameterInspection */
@@ -626,10 +636,7 @@ trait Custom_Post {
 	 *
 	 * @return string
 	 */
-	protected function handle_bulk_actions(
-		/** @noinspection PhpUnusedParameterInspection */
-		$sendback, $doaction, array $post_ids
-	) {
+	protected function handle_bulk_actions( $sendback, $doaction, array $post_ids ) {
 		if ( ! empty( $post_ids ) && 'export' === $doaction && $this->is_support_io() ) {
 			$this->export( $post_ids );
 		}
@@ -643,6 +650,7 @@ trait Custom_Post {
 	 * @param array $post_ids
 	 *
 	 * @return string
+	 * @SuppressWarnings(PHPMD.UnusedFormalParameter)
 	 */
 	protected function filter_handle_bulk_actions(
 		/** @noinspection PhpUnusedParameterInspection */
@@ -653,6 +661,7 @@ trait Custom_Post {
 
 	/**
 	 * @param array $post_ids
+	 * @SuppressWarnings(PHPMD.ExitExpression)
 	 */
 	private function export( $post_ids ) {
 		$export_data = [];
@@ -664,13 +673,13 @@ trait Custom_Post {
 			}, false ), 'data' ) as $d
 		) {
 			$data = [];
-			if ( in_array( 'title', $this->get_post_type_supports() ) ) {
+			if ( in_array( 'title', $this->get_post_type_supports(), true ) ) {
 				$data['post_title'] = $d['post']->post_title;
 			}
-			if ( in_array( 'editor', $this->get_post_type_supports() ) ) {
+			if ( in_array( 'editor', $this->get_post_type_supports(), true ) ) {
 				$data['post_content'] = $d['post']->post_content;
 			}
-			if ( in_array( 'excerpt', $this->get_post_type_supports() ) ) {
+			if ( in_array( 'excerpt', $this->get_post_type_supports(), true ) ) {
 				$data['post_excerpt'] = $d['post']->post_excerpt;
 			}
 			foreach ( $setting as $k => $v ) {
@@ -702,7 +711,7 @@ trait Custom_Post {
 	 * @param array $data
 	 */
 	private function output_json_file( $data ) {
-		$json = @json_encode( $data );
+		$json = @wp_json_encode( $data ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 		header( 'Content-Type: application/json' );
 		header( 'Content-Length: ' . strlen( $json ) );
 		header( 'Content-Disposition: attachment; filename="' . $this->get_export_filename() . '"' );
@@ -729,20 +738,9 @@ trait Custom_Post {
 	 * }
 	 */
 	public function import( $data ) {
-		if ( ! $this->is_support_io() ) {
-			return [ 0, $this->translate( 'JSON Import is not supported.' ), 0, 0 ];
-		}
-		if ( empty( $data ) ) {
-			return [ 0, $this->translate( 'Invalid JSON file' ), 0, 0 ];
-		}
-
-		$json = @json_decode( $data, true );
-		if ( empty( $json ) || empty( $json['plugin'] ) || empty( $json['table'] ) || ! isset( $json['data'] ) || ! is_array( $json['data'] ) ) {
-			return [ 0, $this->translate( 'Invalid JSON file' ), 0, 0 ];
-		}
-
-		if ( $json['plugin'] !== $this->app->plugin_name || $json['table'] !== $this->get_related_table_name() ) {
-			return [ 0, $this->translate( 'Invalid JSON file' ), 0, 0 ];
+		list( $result, $json ) = $this->validate_import_data( $data );
+		if ( is_string( $result ) ) {
+			return [ 0, $result, 0, 0 ];
 		}
 
 		$success = 0;
@@ -774,6 +772,31 @@ trait Custom_Post {
 	}
 
 	/**
+	 * @param mixed $data
+	 *
+	 * @return array
+	 */
+	private function validate_import_data( $data ) {
+		if ( ! $this->is_support_io() ) {
+			return [ $this->translate( 'JSON Import is not supported.' ), null ];
+		}
+		if ( empty( $data ) ) {
+			return [ $this->translate( 'Invalid JSON file' ), null ];
+		}
+
+		$json = @json_decode( $data, true ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		if ( empty( $json ) || empty( $json['plugin'] ) || empty( $json['table'] ) || ! isset( $json['data'] ) || ! is_array( $json['data'] ) ) {
+			return [ $this->translate( 'Invalid JSON file' ), null ];
+		}
+
+		if ( $json['plugin'] !== $this->app->plugin_name || $json['table'] !== $this->get_related_table_name() ) {
+			return [ $this->translate( 'Invalid JSON file' ), null ];
+		}
+
+		return [ true, $json ];
+	}
+
+	/**
 	 * @param array $data
 	 *
 	 * @return string
@@ -791,7 +814,9 @@ trait Custom_Post {
 	public function manage_posts_columns( array $columns, $sortable = false ) {
 		if ( ! $sortable ) {
 			$title = $this->get_post_column_title();
-			! isset( $title ) and isset( $columns['title'] ) and $title = $columns['title'];
+			if ( ! isset( $title ) && isset( $columns['title'] ) ) {
+				$title = $columns['title'];
+			}
 			$date = isset( $columns['date'] ) ? $columns['date'] : null;
 			unset( $columns['date'] );
 		}
@@ -800,8 +825,12 @@ trait Custom_Post {
 		$columns = $this->post_filter_posts_columns( $columns, $sortable );
 
 		if ( ! $sortable ) {
-			isset( $title ) and $columns['title'] = $title;
-			isset( $date ) and $columns['date'] = $date;
+			if ( isset( $title ) ) {
+				$columns['title'] = $title;
+			}
+			if ( isset( $date ) ) {
+				$columns['date'] = $date;
+			}
 		}
 
 		return $columns;
@@ -827,31 +856,49 @@ trait Custom_Post {
 		unset( $columns['word-count'] );
 
 		$_columns = $this->app->db->get_columns( $this->get_related_table_name() );
-		foreach ( $this->get_manage_posts_columns() as $k => $v ) {
-			if ( $sortable && ( ! is_array( $v ) || empty( $v['sortable'] ) ) ) {
+		foreach ( $this->get_manage_posts_columns() as $key => $value ) {
+			if ( $sortable && ( ! is_array( $value ) || empty( $value['sortable'] ) ) ) {
 				continue;
 			}
-			if ( is_array( $v ) && ! empty( $v['hide'] ) ) {
-				continue;
-			}
-
-			$key = $this->get_post_type() . '-' . $k;
-			if ( $sortable ) {
-				$order = ! empty( $v['desc'] );
-				! empty( $v['default_sort'] ) and $order = ! $order;
-				$columns[ $key ] = [ $key, $order ];
+			if ( is_array( $value ) && ! empty( $value['hide'] ) ) {
 				continue;
 			}
 
-			$name = isset( $_columns[ $k ] ) ? $this->table_column_to_name( $k, $_columns ) : '';
-			if ( is_array( $v ) ) {
-				if ( isset( $v['name'] ) ) {
-					$name = $v['name'];
-				}
-				$columns[ $key ] = $name;
-			} elseif ( ! $sortable ) {
-				$columns[ $key ] = empty( $name ) ? $k : $name;
+			$columns = $this->get_column_data( $columns, $key, $value, $sortable, $_columns );
+		}
+
+		return $columns;
+	}
+
+	/**
+	 * @param $columns
+	 * @param $key
+	 * @param $value
+	 * @param $sortable
+	 * @param $_columns
+	 *
+	 * @return array
+	 */
+	private function get_column_data( $columns, $key, $value, $sortable, $_columns ) {
+		$_key = $this->get_post_type() . '-' . $key;
+		if ( $sortable ) {
+			$order = ! empty( $value['desc'] );
+			if ( ! empty( $value['default_sort'] ) ) {
+				$order = ! $order;
 			}
+			$columns[ $_key ] = [ $_key, $order ];
+
+			return $columns;
+		}
+
+		$name = isset( $_columns[ $key ] ) ? $this->table_column_to_name( $key, $_columns ) : '';
+		if ( is_array( $value ) ) {
+			if ( isset( $value['name'] ) ) {
+				$name = $value['name'];
+			}
+			$columns[ $_key ] = $name;
+		} elseif ( ! $sortable ) {
+			$columns[ $_key ] = empty( $name ) ? $key : $name;
 		}
 
 		return $columns;
@@ -862,6 +909,7 @@ trait Custom_Post {
 	 * @param bool $sortable
 	 *
 	 * @return array
+	 * @SuppressWarnings(PHPMD.UnusedFormalParameter)
 	 */
 	protected function post_filter_posts_columns(
 		/** @noinspection PhpUnusedParameterInspection */
@@ -881,10 +929,7 @@ trait Custom_Post {
 	 * @param string $column_name
 	 * @param WP_Post $post
 	 */
-	public function manage_posts_custom_column(
-		/** @noinspection PhpUnusedParameterInspection */
-		$column_name, WP_Post $post
-	) {
+	public function manage_posts_custom_column( $column_name, WP_Post $post ) {
 		$data = $this->get_related_data( $post->ID );
 		if ( empty( $data ) ) {
 			return;
@@ -897,10 +942,7 @@ trait Custom_Post {
 	 * @param WP_Post $post
 	 * @param array $data
 	 */
-	protected function manage_posts_column(
-		/** @noinspection PhpUnusedParameterInspection */
-		$column_name, WP_Post $post, array $data
-	) {
+	protected function manage_posts_column( $column_name, WP_Post $post, array $data ) {
 		foreach ( $this->get_manage_posts_columns() as $k => $v ) {
 			$key = $this->get_post_type() . '-' . $k;
 			if ( $column_name === $key ) {
@@ -954,23 +996,23 @@ trait Custom_Post {
 	 * @return array|false
 	 */
 	public function get_related_data( $post_id ) {
-		if ( ! isset( $this->_related_data[ $post_id ] ) ) {
+		if ( ! isset( $this->related_data[ $post_id ] ) ) {
 			$data = $this->query()->where( 'post_id', $post_id )->row();
 			if ( empty( $data ) ) {
 				$data = false;
 			} else {
 				$post = get_post( $post_id );
-				if ( empty( $post ) || $post->post_type != $this->get_post_type() ) {
+				if ( empty( $post ) || $post->post_type !== $this->get_post_type() ) {
 					$data = false;
 				} else {
 					$data = $this->filter_item( $this->set_post_data( $data, $post ) );
 				}
 			}
 
-			$this->_related_data[ $post_id ] = $data;
+			$this->related_data[ $post_id ] = $data;
 		}
 
-		return $this->_related_data[ $post_id ];
+		return $this->related_data[ $post_id ];
 	}
 
 	/**
@@ -984,9 +1026,10 @@ trait Custom_Post {
 		if ( empty( $data ) ) {
 			return false;
 		}
+
 		$post_id = $data['post_id'];
 		$post    = get_post( $post_id );
-		if ( empty( $post ) || $post->post_type != $this->get_post_type() || ( $is_valid && $post->post_status !== 'publish' ) ) {
+		if ( empty( $post ) || $post->post_type !== $this->get_post_type() || ( $is_valid && 'publish' !== $post->post_status ) ) {
 			return false;
 		}
 
@@ -1023,8 +1066,21 @@ trait Custom_Post {
 		if ( $per_page > 0 ) {
 			$query->limit( $per_page );
 		}
+
+		return $this->get_return_data( $query, $total, $total_page, $page );
+	}
+
+	/**
+	 * @param Builder $query
+	 * @param int $total
+	 * @param int $total_page
+	 * @param int $page
+	 *
+	 * @return array
+	 */
+	private function get_return_data( Builder $query, $total, $total_page, $page ) {
 		$list = $query->get();
-		if ( empty( $list ) ) {
+		if ( $list->is_empty() ) {
 			return [
 				'total'      => 0,
 				'total_page' => 0,
@@ -1033,7 +1089,7 @@ trait Custom_Post {
 			];
 		}
 
-		$post_ids = $this->app->array->pluck( $list, 'post_id' );
+		$post_ids = $list->pluck( 'post_id' );
 		$posts    = get_posts( [
 			'include'     => $post_ids,
 			'post_type'   => $this->get_post_type(),
@@ -1045,9 +1101,9 @@ trait Custom_Post {
 			'total'      => $total,
 			'total_page' => $total_page,
 			'page'       => $page,
-			'data'       => array_map( function ( $d ) use ( $posts ) {
-				return $this->filter_item( $this->set_post_data( $d, $posts[ $d['post_id'] ] ) );
-			}, $list ),
+			'data'       => $list->map( function ( $data ) use ( $posts ) {
+				return $this->filter_item( $this->set_post_data( $data, $posts[ $data['post_id'] ] ) );
+			} ),
 		];
 	}
 
@@ -1092,12 +1148,13 @@ trait Custom_Post {
 	}
 
 	/**
-	 * @param array $d
+	 * @param array $data
 	 *
 	 * @return array
+	 * @SuppressWarnings(PHPMD.UnusedFormalParameter)
 	 */
-	protected function filter_item( array $d ) {
-		return $d;
+	protected function filter_item( array $data ) {
+		return $data;
 	}
 
 	/**
@@ -1110,6 +1167,7 @@ trait Custom_Post {
 	 */
 	public function update_data( array $params, array $where, WP_Post $post, $update ) {
 		$params = array_merge( $params, $this->get_update_data_params( $post, $update ) );
+
 		list( $params, $where ) = $this->update_misc( $params, $where, $post, $update );
 
 		return $this->query()->update_or_insert( $where, $params );
@@ -1120,18 +1178,18 @@ trait Custom_Post {
 	 * @param WP_Post $post
 	 * @param array $old
 	 * @param array $new
+	 * @SuppressWarnings(PHPMD.UnusedFormalParameter)
 	 */
 	public function data_updated( $post_id, WP_Post $post, array $old, array $new ) {
-
 	}
 
 	/**
 	 * @param int $post_id
 	 * @param WP_Post $post
 	 * @param array $data
+	 * @SuppressWarnings(PHPMD.UnusedFormalParameter)
 	 */
 	public function data_inserted( $post_id, WP_Post $post, array $data ) {
-
 	}
 
 	/**
@@ -1141,6 +1199,7 @@ trait Custom_Post {
 	 * @param bool $update
 	 *
 	 * @return array
+	 * @SuppressWarnings(PHPMD.UnusedFormalParameter)
 	 */
 	protected function update_misc(
 		/** @noinspection PhpUnusedParameterInspection */
@@ -1154,6 +1213,7 @@ trait Custom_Post {
 	 * @param bool $update
 	 *
 	 * @return array
+	 * @SuppressWarnings(PHPMD.UnusedFormalParameter)
 	 */
 	public function get_update_data_params(
 		/** @noinspection PhpUnusedParameterInspection */
@@ -1202,16 +1262,16 @@ trait Custom_Post {
 	/**
 	 * @param int $post_id
 	 * @param WP_Post $post
+	 * @SuppressWarnings(PHPMD.UnusedFormalParameter)
 	 */
 	public function untrash_post( $post_id, WP_Post $post ) {
-
 	}
 
 	/**
 	 * @param int $post_id
+	 * @SuppressWarnings(PHPMD.UnusedFormalParameter)
 	 */
 	public function trash_post( $post_id ) {
-
 	}
 
 	/**
@@ -1227,9 +1287,9 @@ trait Custom_Post {
 
 	/**
 	 * @param int $post_id
+	 * @SuppressWarnings(PHPMD.UnusedFormalParameter)
 	 */
 	protected function delete_misc( $post_id ) {
-
 	}
 
 	/**
@@ -1283,7 +1343,7 @@ trait Custom_Post {
 		} else {
 			$value = $this->app->input->post( $this->get_post_field_name( $key ), $default );
 		}
-		if ( ! $update && 'bool' === $this->app->array->get( $setting, 'type' ) && (string) $value === '' ) {
+		if ( ! $update && 'bool' === $this->app->array->get( $setting, 'type' ) && '' === (string) $value ) {
 			$value = null;
 		}
 
@@ -1301,6 +1361,7 @@ trait Custom_Post {
 	 * @param array|null $post_array
 	 *
 	 * @return mixed
+	 * @SuppressWarnings(PHPMD.UnusedFormalParameter)
 	 */
 	protected function filter_post_field(
 		/** @noinspection PhpUnusedParameterInspection */
@@ -1331,7 +1392,7 @@ trait Custom_Post {
 			$columns[ $k ]['nullable']      = ! isset( $v['null'] ) || ! empty( $v['null'] );
 			$columns[ $k ]['required']      = ! isset( $v['default'] ) && ! $columns[ $k ]['nullable'] && 'bool' !== $type;
 			$columns[ $k ]['unset_if_null'] = ! $columns[ $k ]['nullable'] && isset( $v['default'] );
-			if ( $columns[ $k ]['nullable'] && isset( $v['default'] ) and ( $prior_default || ! empty( $v['prior_default'] ) ) ) {
+			if ( $columns[ $k ]['nullable'] && isset( $v['default'] ) && ( $prior_default || ! empty( $v['prior_default'] ) ) ) {
 				$columns[ $k ]['unset_if_null'] = true;
 			}
 		}
@@ -1371,24 +1432,24 @@ trait Custom_Post {
 	/**
 	 * @param WP_Post $post
 	 * @param array $params
+	 * @SuppressWarnings(PHPMD.UnusedFormalParameter)
 	 */
 	protected function before_output_edit_form( WP_Post $post, array $params ) {
-
 	}
 
 	/**
 	 * @param WP_Post $post
 	 * @param array $params
+	 * @SuppressWarnings(PHPMD.UnusedFormalParameter)
 	 */
 	protected function after_output_edit_form( WP_Post $post, array $params ) {
-
 	}
 
 	/**
 	 * @param WP_Post $post
+	 * @SuppressWarnings(PHPMD.UnusedFormalParameter)
 	 */
 	public function output_after_editor( WP_Post $post ) {
-
 	}
 
 	/**
@@ -1409,11 +1470,11 @@ trait Custom_Post {
 	 * @return array
 	 */
 	private function get_table_columns() {
-		return $this->app->array->map( $this->app->db->get_columns( $this->get_related_table_name() ), function ( $d ) {
-			$d['form_type'] = $this->get_form_by_type( $d['type'] );
-			$d['required']  = ! isset( $d['default'] ) && isset( $d['null'] ) && empty( $d['null'] );
+		return $this->app->array->map( $this->app->db->get_columns( $this->get_related_table_name() ), function ( $data ) {
+			$data['form_type'] = $this->get_form_by_type( $data['type'] );
+			$data['required']  = ! isset( $data['default'] ) && isset( $data['null'] ) && empty( $data['null'] );
 
-			return $d;
+			return $data;
 		} );
 	}
 
@@ -1431,6 +1492,7 @@ trait Custom_Post {
 	 * @param WP_Post $post
 	 *
 	 * @return array
+	 * @SuppressWarnings(PHPMD.UnusedFormalParameter)
 	 */
 	protected function filter_edit_form_params(
 		/** @noinspection PhpUnusedParameterInspection */
@@ -1445,7 +1507,9 @@ trait Custom_Post {
 	 * @return array
 	 */
 	public function validate_input( $post_array = null ) {
-		! isset( $post_array ) and $post_array = $this->app->input->post();
+		if ( ! isset( $post_array ) ) {
+			$post_array = $this->app->input->post();
+		}
 		$errors = [];
 		foreach ( $this->get_data_field_settings() as $k => $v ) {
 			$param    = $this->get_post_field( $k, null, $post_array, $v );
@@ -1456,7 +1520,7 @@ trait Custom_Post {
 			}
 		}
 
-		if ( $this->validate_post_title() && in_array( 'title', $this->get_post_type_supports() ) ) {
+		if ( $this->validate_post_title() && in_array( 'title', $this->get_post_type_supports(), true ) ) {
 			if ( ! isset( $post_array['post_title'] ) || '' === trim( $post_array['post_title'] ) ) {
 				$errors['post_title'][] = $this->translate( 'Value is required.' );
 			}
@@ -1477,6 +1541,7 @@ trait Custom_Post {
 	 * @param array $post_array
 	 *
 	 * @return array
+	 * @SuppressWarnings(PHPMD.UnusedFormalParameter)
 	 */
 	protected function filter_validate_input(
 		/** @noinspection PhpUnusedParameterInspection */
@@ -1490,6 +1555,7 @@ trait Custom_Post {
 	 * @param array $post_array
 	 *
 	 * @return array
+	 * @SuppressWarnings(PHPMD.UnusedFormalParameter)
 	 */
 	public function filter_post_data(
 		/** @noinspection PhpUnusedParameterInspection */
@@ -1502,14 +1568,12 @@ trait Custom_Post {
 	 * setup list
 	 */
 	public function setup_list() {
-
 	}
 
 	/**
 	 * setup page
 	 */
 	public function setup_page() {
-
 	}
 
 	/**
@@ -1518,18 +1582,15 @@ trait Custom_Post {
 	 *
 	 * @return array
 	 */
-	public function get_error_messages(
-		/** @noinspection PhpUnusedParameterInspection */
-		$key, array $errors
-	) {
+	public function get_error_messages( $key, array $errors ) {
 		$columns = $this->app->db->get_columns( $this->get_related_table_name() );
 		unset( $columns['id'] );
 		$columns = $this->app->array->combine( $columns, 'name' );
 
-		return array_map( function ( $d ) use ( $key, $columns ) {
+		return array_map( function ( $error ) use ( $key, $columns ) {
 			$key = $this->table_column_to_name( $key, $columns );
 
-			return "$d: [{$key}]";
+			return "$error: [{$key}]";
 		}, $errors );
 	}
 
@@ -1552,6 +1613,7 @@ trait Custom_Post {
 	 * @param string $key
 	 *
 	 * @return null|string
+	 * @SuppressWarnings(PHPMD.UnusedFormalParameter)
 	 */
 	protected function get_table_column_name(
 		/** @noinspection PhpUnusedParameterInspection */
@@ -1566,7 +1628,7 @@ trait Custom_Post {
 	 * @return string
 	 */
 	protected function replace_set_param_variable( $str ) {
-		return preg_replace( '#\$\{([\.\w]+)\}#', '<span class="set_param" data-set_param="${1}"/>', $str );
+		return preg_replace( '#\${([.\w]+)}#', '<span class="set_param" data-set_param="${1}"/>', $str );
 	}
 
 	/**
@@ -1582,7 +1644,8 @@ trait Custom_Post {
 	 * @return string
 	 */
 	public function get_edit_post_link( $post_id ) {
-		if ( ! $post = get_post( $post_id ) ) {
+		$post = get_post( $post_id );
+		if ( ! $post ) {
 			return $this->get_post_type_link();
 		}
 		$post_type_object = get_post_type_object( $post->post_type );
