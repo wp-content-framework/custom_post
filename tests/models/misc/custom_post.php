@@ -21,14 +21,14 @@ if ( ! defined( 'WP_CONTENT_FRAMEWORK' ) ) {
 class Custom_Post extends \WP_Framework_Custom_Post\Classes\Models\Custom_Post {
 
 	/**
-	 * @var \WP_Framework_Custom_Post\Interfaces\Custom_Post[] $_custom_posts
+	 * @var \WP_Framework_Custom_Post\Interfaces\Custom_Post[] $custom_posts
 	 */
-	private $_custom_posts;
+	private $custom_posts;
 
 	/**
-	 * @var string[] $_custom_posts_mapper
+	 * @var string[] $custom_posts_mapper
 	 */
-	private $_custom_posts_mapper;
+	private $custom_posts_mapper;
 
 	/**
 	 * initialize
@@ -60,20 +60,20 @@ class Custom_Post extends \WP_Framework_Custom_Post\Classes\Models\Custom_Post {
 	 * @return \WP_Framework_Custom_Post\Interfaces\Custom_Post[]
 	 */
 	public function get_custom_posts() {
-		if ( ! isset( $this->_custom_posts ) ) {
-			$this->_custom_posts        = [ Test::get_instance( $this->app ) ];
-			$post_types                 = array_map( function ( $d ) {
-				/** @var \WP_Framework_Custom_Post\Interfaces\Custom_Post $d */
-				return $d->get_post_type();
-			}, $this->_custom_posts );
-			$this->_custom_posts_mapper = array_map( function ( $d ) {
-				/** @var \WP_Framework_Custom_Post\Interfaces\Custom_Post $d */
-				return $d->get_post_type_slug();
-			}, $this->_custom_posts );
-			$this->_custom_posts        = array_combine( $post_types, $this->_custom_posts );
-			$this->_custom_posts_mapper = array_combine( $this->_custom_posts_mapper, $post_types );
+		if ( ! isset( $this->custom_posts ) ) {
+			$this->custom_posts        = [ Test::get_instance( $this->app ) ];
+			$post_types                = array_map( function ( $custom_post ) {
+				/** @var \WP_Framework_Custom_Post\Interfaces\Custom_Post $custom_post */
+				return $custom_post->get_post_type();
+			}, $this->custom_posts );
+			$this->custom_posts_mapper = array_map( function ( $custom_post ) {
+				/** @var \WP_Framework_Custom_Post\Interfaces\Custom_Post $custom_post */
+				return $custom_post->get_post_type_slug();
+			}, $this->custom_posts );
+			$this->custom_posts        = array_combine( $post_types, $this->custom_posts );
+			$this->custom_posts_mapper = array_combine( $this->custom_posts_mapper, $post_types );
 		}
 
-		return $this->_custom_posts;
+		return $this->custom_posts;
 	}
 }

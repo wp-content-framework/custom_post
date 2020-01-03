@@ -55,7 +55,7 @@ class Import extends Base {
 			return '';
 		}
 
-		if ( empty( $_FILES['import']['tmp_name'] ) || ! is_uploaded_file( $_FILES['import']['tmp_name'] ) ) {
+		if ( ! $this->app->input->is_uploaded_file( 'import.tmp_name' ) ) {
 			return '';
 		}
 
@@ -110,7 +110,8 @@ class Import extends Base {
 		$_custom_post = \WP_Framework_Custom_Post\Classes\Models\Custom_Post::get_instance( $this->app );
 		/** @var Custom_Post $custom_post */
 		$custom_post = $_custom_post->get_custom_post_type( $params['post_type'] );
-		list( $result, $message, $success, $fail ) = $custom_post->import( @file_get_contents( $_FILES['import']['tmp_name'] ) );
+
+		list( $result, $message, $success, $fail ) = $custom_post->import( $this->app->file->get_contents( $this->app->input->file( 'import.tmp_name' ) ) );
 
 		return new WP_REST_Response( [
 			'result'  => $result,

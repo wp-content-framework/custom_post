@@ -13,7 +13,6 @@ if ( ! defined( 'WP_CONTENT_FRAMEWORK' ) ) {
 }
 
 return [
-
 	'custom_post' => [
 		'init'                         => [
 			'register_post_types' => 9,
@@ -84,5 +83,4 @@ return [
 			'edit_form_after_editor',
 		],
 	],
-
 ];

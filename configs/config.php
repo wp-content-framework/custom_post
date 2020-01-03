@@ -13,11 +13,9 @@ if ( ! defined( 'WP_CONTENT_FRAMEWORK' ) ) {
 }
 
 return [
-
 	// prior default (to nullable)
 	'prior_default'              => false,
 
 	// required wordpress version
 	'required_wordpress_version' => '4.6', // WP_Post_Type >= 4.6
-
 ];

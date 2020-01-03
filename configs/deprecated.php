@@ -13,7 +13,5 @@ if ( ! defined( 'WP_CONTENT_FRAMEWORK' ) ) {
 }
 
 return [
-
 	'\WP_Framework_Custom_Post\Traits\Custom_Post' => '\WP_Framework_Custom_Post\Deprecated\Traits\Custom_Post',
-
 ];
