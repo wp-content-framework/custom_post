@@ -711,7 +711,7 @@ trait Custom_Post {
 	 * @param array $data
 	 */
 	private function output_json_file( $data ) {
-		$json = @wp_json_encode( $data ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		$json = $this->app->utility->json_encode( $data );
 		header( 'Content-Type: application/json' );
 		header( 'Content-Length: ' . strlen( $json ) );
 		header( 'Content-Disposition: attachment; filename="' . $this->get_export_filename() . '"' );
