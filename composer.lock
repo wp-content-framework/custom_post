@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6c3666b115f37ee9463905188f6d649b",
+    "content-hash": "129af8011891c189e058d51b324e2dba",
     "packages": [
         {
             "name": "matthiasmullie/minify",
@@ -117,22 +117,22 @@
         },
         {
             "name": "wp-content-framework/admin",
-            "version": "v0.0.35",
+            "version": "v1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wp-content-framework/admin.git",
-                "reference": "1a67fd93fcca6b56b09872457c49316c293ab79a"
+                "reference": "2a97ca39c8bdf37c93e07fa28509fc67000ea956"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wp-content-framework/admin/zipball/1a67fd93fcca6b56b09872457c49316c293ab79a",
-                "reference": "1a67fd93fcca6b56b09872457c49316c293ab79a",
+                "url": "https://api.github.com/repos/wp-content-framework/admin/zipball/2a97ca39c8bdf37c93e07fa28509fc67000ea956",
+                "reference": "2a97ca39c8bdf37c93e07fa28509fc67000ea956",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.6.0",
-                "wp-content-framework/controller": "^0.0.7",
-                "wp-content-framework/view": "^0.0.11"
+                "wp-content-framework/controller": "^1.0",
+                "wp-content-framework/view": "^1.0"
             },
             "require-dev": {
                 "dealerdirect/phpcodesniffer-composer-installer": "^0.5.0",
@@ -159,25 +159,25 @@
                 "framework",
                 "wordpress"
             ],
-            "time": "2020-01-06T16:36:27+00:00"
+            "time": "2020-01-07T17:52:26+00:00"
         },
         {
             "name": "wp-content-framework/api",
-            "version": "v0.0.16",
+            "version": "v1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wp-content-framework/api.git",
-                "reference": "da58b2991b798cbe5b600805320d72380d568027"
+                "reference": "0438d4c5046f7b07edd837abd48752f7cdf03adf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wp-content-framework/api/zipball/da58b2991b798cbe5b600805320d72380d568027",
-                "reference": "da58b2991b798cbe5b600805320d72380d568027",
+                "url": "https://api.github.com/repos/wp-content-framework/api/zipball/0438d4c5046f7b07edd837abd48752f7cdf03adf",
+                "reference": "0438d4c5046f7b07edd837abd48752f7cdf03adf",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.6.0",
-                "wp-content-framework/controller": "^0.0.7"
+                "wp-content-framework/controller": "^1.0"
             },
             "require-dev": {
                 "dealerdirect/phpcodesniffer-composer-installer": "^0.5.0",
@@ -204,25 +204,25 @@
                 "framework",
                 "wordpress"
             ],
-            "time": "2020-01-06T16:25:07+00:00"
+            "time": "2020-01-07T17:54:34+00:00"
         },
         {
             "name": "wp-content-framework/controller",
-            "version": "v0.0.7",
+            "version": "v1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wp-content-framework/controller.git",
-                "reference": "a00345df388e4066b33339489df6f96f70fae3c6"
+                "reference": "b0428bf5b88da1b8a42e592bd5d9e218bb7588f9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wp-content-framework/controller/zipball/a00345df388e4066b33339489df6f96f70fae3c6",
-                "reference": "a00345df388e4066b33339489df6f96f70fae3c6",
+                "url": "https://api.github.com/repos/wp-content-framework/controller/zipball/b0428bf5b88da1b8a42e592bd5d9e218bb7588f9",
+                "reference": "b0428bf5b88da1b8a42e592bd5d9e218bb7588f9",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.6.0",
-                "wp-content-framework/presenter": "^0.0.22"
+                "wp-content-framework/presenter": "^1.0"
             },
             "require-dev": {
                 "dealerdirect/phpcodesniffer-composer-installer": "^0.5.0",
@@ -249,20 +249,20 @@
                 "framework",
                 "wordpress"
             ],
-            "time": "2020-01-06T15:50:05+00:00"
+            "time": "2020-01-07T17:39:47+00:00"
         },
         {
             "name": "wp-content-framework/db",
-            "version": "v0.0.24",
+            "version": "v1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wp-content-framework/db.git",
-                "reference": "99c676da9d04717ed2868eeb7c813aac2b35a6ea"
+                "reference": "107d920ad8ff096713852918428b9be58f0c9dd3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wp-content-framework/db/zipball/99c676da9d04717ed2868eeb7c813aac2b35a6ea",
-                "reference": "99c676da9d04717ed2868eeb7c813aac2b35a6ea",
+                "url": "https://api.github.com/repos/wp-content-framework/db/zipball/107d920ad8ff096713852918428b9be58f0c9dd3",
+                "reference": "107d920ad8ff096713852918428b9be58f0c9dd3",
                 "shasum": ""
             },
             "require": {
@@ -295,20 +295,20 @@
                 "framework",
                 "wordpress"
             ],
-            "time": "2020-01-02T04:03:14+00:00"
+            "time": "2020-01-07T17:22:14+00:00"
         },
         {
             "name": "wp-content-framework/presenter",
-            "version": "v0.0.22",
+            "version": "v1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wp-content-framework/presenter.git",
-                "reference": "988d879858357e1e39770bb30baf3b2ec4085e32"
+                "reference": "abc0e7fa70fbae17780b255fd3dddbdf5adb15a4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wp-content-framework/presenter/zipball/988d879858357e1e39770bb30baf3b2ec4085e32",
-                "reference": "988d879858357e1e39770bb30baf3b2ec4085e32",
+                "url": "https://api.github.com/repos/wp-content-framework/presenter/zipball/abc0e7fa70fbae17780b255fd3dddbdf5adb15a4",
+                "reference": "abc0e7fa70fbae17780b255fd3dddbdf5adb15a4",
                 "shasum": ""
             },
             "require": {
@@ -340,11 +340,11 @@
                 "framework",
                 "wordpress"
             ],
-            "time": "2020-01-02T08:26:52+00:00"
+            "time": "2020-01-07T17:29:14+00:00"
         },
         {
             "name": "wp-content-framework/session",
-            "version": "v0.0.9",
+            "version": "v1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wp-content-framework/session.git",
@@ -388,21 +388,21 @@
         },
         {
             "name": "wp-content-framework/view",
-            "version": "v0.0.11",
+            "version": "v1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wp-content-framework/view.git",
-                "reference": "441cd0d87f3d302019355f90dd7e944dd6c8b118"
+                "reference": "d3e2dccc7c0943dc3ee98ea697e4d9364917b443"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wp-content-framework/view/zipball/441cd0d87f3d302019355f90dd7e944dd6c8b118",
-                "reference": "441cd0d87f3d302019355f90dd7e944dd6c8b118",
+                "url": "https://api.github.com/repos/wp-content-framework/view/zipball/d3e2dccc7c0943dc3ee98ea697e4d9364917b443",
+                "reference": "d3e2dccc7c0943dc3ee98ea697e4d9364917b443",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.6.0",
-                "wp-content-framework/presenter": "^0.0.22"
+                "wp-content-framework/presenter": "^1.0"
             },
             "require-dev": {
                 "dealerdirect/phpcodesniffer-composer-installer": "^0.5.0",
@@ -429,7 +429,7 @@
                 "framework",
                 "wordpress"
             ],
-            "time": "2020-01-02T09:12:17+00:00"
+            "time": "2020-01-07T17:39:45+00:00"
         }
     ],
     "packages-dev": [
