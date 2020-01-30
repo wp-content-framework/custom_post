@@ -1208,6 +1208,26 @@ trait Custom_Post {
 		return [ $params, $where ];
 	}
 
+	private function set_empty_params( $params, $key, $setting, $not_sent, $update ) {
+		if ( ! $not_sent ) {
+			if ( $setting['unset_if_null'] ) {
+				$params[ $key ] = $setting['default'];
+			} else {
+				$params[ $key ] = null;
+			}
+		} else {
+			if ( $update ) {
+				unset( $params[ $key ] );
+			} else {
+				if ( $setting['unset_if_null'] ) {
+					unset( $params[ $key ] );
+				}
+			}
+		}
+
+		return $params;
+	}
+
 	/**
 	 * @param WP_Post $post
 	 * @param bool $update
@@ -1227,24 +1247,11 @@ trait Custom_Post {
 				continue;
 			}
 
+			$check_null   = ( $is_bool && $not_sent ) || ( ! $update && $v['unset_if_null'] );
 			$params[ $k ] = $this->get_post_field( $k, $update || ! $v['required'] ? null : $v['default'], null, $v, true, $update );
-			$params[ $k ] = $this->sanitize_input( $params[ $k ], $v['type'], ! $update && $v['unset_if_null'], $v['nullable'], $update );
-			if ( ! isset( $params[ $k ] ) ) {
-				if ( ! $not_sent ) {
-					if ( $v['unset_if_null'] ) {
-						$params[ $k ] = $v['default'];
-					} else {
-						$params[ $k ] = null;
-					}
-				} else {
-					if ( $update ) {
-						unset( $params[ $k ] );
-					} else {
-						if ( $v['unset_if_null'] ) {
-							unset( $params[ $k ] );
-						}
-					}
-				}
+			$params[ $k ] = $this->sanitize_input( $params[ $k ], $v['type'], $check_null, $v['nullable'], $update );
+			if ( ! ( $is_bool && $not_sent ) && ! isset( $params[ $k ] ) ) {
+				$params = $this->set_empty_params( $params, $k, $v, $not_sent, $update );
 			}
 		}
 
