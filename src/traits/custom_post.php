@@ -1103,7 +1103,7 @@ trait Custom_Post {
 			'page'       => $page,
 			'data'       => $list->map( function ( $data ) use ( $posts ) {
 				return $this->filter_item( $this->set_post_data( $data, $posts[ $data['post_id'] ] ) );
-			} ),
+			} )->to_array(),
 		];
 	}
 
@@ -1208,6 +1208,26 @@ trait Custom_Post {
 		return [ $params, $where ];
 	}
 
+	private function set_empty_params( $params, $key, $setting, $not_sent, $update ) {
+		if ( ! $not_sent ) {
+			if ( $setting['unset_if_null'] ) {
+				$params[ $key ] = $setting['default'];
+			} else {
+				$params[ $key ] = null;
+			}
+		} else {
+			if ( $update ) {
+				unset( $params[ $key ] );
+			} else {
+				if ( $setting['unset_if_null'] ) {
+					unset( $params[ $key ] );
+				}
+			}
+		}
+
+		return $params;
+	}
+
 	/**
 	 * @param WP_Post $post
 	 * @param bool $update
@@ -1221,38 +1241,17 @@ trait Custom_Post {
 	) {
 		$params = [];
 		foreach ( $this->get_data_field_settings() as $k => $v ) {
-			$is_bool  = 'bool' === $v['type'];
+			$is_bool  = 'bool' === $this->app->array->get( $v, 'type' );
 			$not_sent = null === $this->app->input->post( $this->get_post_field_name( $k ) );
-			if ( $is_bool && $not_sent ) {
-				if ( $v['nullable'] ) {
-					if ( $update ) {
-						continue;
-					}
-					$params[ $k ] = null;
-				} else {
-					$params[ $k ] = 0;
-				}
-			} else {
-				$params[ $k ] = $this->get_post_field( $k, $update || ! $v['required'] ? null : $v['default'], null, $v, true, $update );
-				$params[ $k ] = $this->sanitize_input( $params[ $k ], $v['type'], ! $update && $v['unset_if_null'], $v['nullable'], $update );
+			if ( $is_bool && $not_sent && $v['nullable'] && $update ) {
+				continue;
+			}
 
-				if ( ! isset( $params[ $k ] ) ) {
-					if ( ! $not_sent ) {
-						if ( $v['unset_if_null'] ) {
-							$params[ $k ] = $v['default'];
-						} else {
-							$params[ $k ] = null;
-						}
-					} else {
-						if ( $update ) {
-							unset( $params[ $k ] );
-						} else {
-							if ( $v['unset_if_null'] ) {
-								unset( $params[ $k ] );
-							}
-						}
-					}
-				}
+			$check_null   = ( $is_bool && $not_sent ) || ( ! $update && $v['unset_if_null'] );
+			$params[ $k ] = $this->get_post_field( $k, $update || ! $v['required'] ? null : $v['default'], null, $v, true, $update );
+			$params[ $k ] = $this->sanitize_input( $params[ $k ], $v['type'], $check_null, $v['nullable'], $update );
+			if ( ! ( $is_bool && $not_sent ) && ! isset( $params[ $k ] ) ) {
+				$params = $this->set_empty_params( $params, $k, $v, $not_sent, $update );
 			}
 		}
 
@@ -1338,13 +1337,19 @@ trait Custom_Post {
 	 * @return mixed
 	 */
 	protected function get_post_field( $key, $default = null, $post_array = null, array $setting = [], $filter = true, $update = false ) {
-		if ( isset( $post_array ) ) {
-			$value = $this->app->array->get( $post_array, $this->get_post_field_name( $key ), $default );
+		$is_bool  = 'bool' === $this->app->array->get( $setting, 'type' );
+		$not_sent = null === $this->app->input->post( $this->get_post_field_name( $key ) );
+		if ( $is_bool && $not_sent ) {
+			$value = $this->app->array->get( $setting, 'nullable' ) ? null : 0;
 		} else {
-			$value = $this->app->input->post( $this->get_post_field_name( $key ), $default );
-		}
-		if ( ! $update && 'bool' === $this->app->array->get( $setting, 'type' ) && '' === (string) $value ) {
-			$value = null;
+			if ( isset( $post_array ) ) {
+				$value = $this->app->array->get( $post_array, $this->get_post_field_name( $key ), $default );
+			} else {
+				$value = $this->app->input->post( $this->get_post_field_name( $key ), $default );
+			}
+			if ( ! $update && $is_bool && '' === (string) $value ) {
+				$value = null;
+			}
 		}
 
 		if ( ! $filter ) {
