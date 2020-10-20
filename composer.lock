@@ -117,16 +117,16 @@
         },
         {
             "name": "wp-content-framework/admin",
-            "version": "v1.0.28",
+            "version": "v1.0.29",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wp-content-framework/admin.git",
-                "reference": "255ef2e2d98a5fc4cd60a11753a06e0a4595ae92"
+                "reference": "b3f07be083dcccd754f4a5c0adc60e906981c1e3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wp-content-framework/admin/zipball/255ef2e2d98a5fc4cd60a11753a06e0a4595ae92",
-                "reference": "255ef2e2d98a5fc4cd60a11753a06e0a4595ae92",
+                "url": "https://api.github.com/repos/wp-content-framework/admin/zipball/b3f07be083dcccd754f4a5c0adc60e906981c1e3",
+                "reference": "b3f07be083dcccd754f4a5c0adc60e906981c1e3",
                 "shasum": ""
             },
             "require": {
@@ -165,20 +165,20 @@
                     "type": "custom"
                 }
             ],
-            "time": "2020-10-07T06:23:39+00:00"
+            "time": "2020-10-14T06:57:20+00:00"
         },
         {
             "name": "wp-content-framework/api",
-            "version": "v1.0.23",
+            "version": "v1.0.24",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wp-content-framework/api.git",
-                "reference": "580daf20b7330aca59e01faf610d8bf58e378eb0"
+                "reference": "ba43717815df03296317561bc49abc2dd4ad1dca"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wp-content-framework/api/zipball/580daf20b7330aca59e01faf610d8bf58e378eb0",
-                "reference": "580daf20b7330aca59e01faf610d8bf58e378eb0",
+                "url": "https://api.github.com/repos/wp-content-framework/api/zipball/ba43717815df03296317561bc49abc2dd4ad1dca",
+                "reference": "ba43717815df03296317561bc49abc2dd4ad1dca",
                 "shasum": ""
             },
             "require": {
@@ -216,7 +216,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2020-10-06T09:17:43+00:00"
+            "time": "2020-10-13T05:26:24+00:00"
         },
         {
             "name": "wp-content-framework/controller",
